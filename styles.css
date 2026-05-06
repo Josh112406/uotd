@@ -98,7 +98,7 @@ body.landing .auth-card {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .message {
