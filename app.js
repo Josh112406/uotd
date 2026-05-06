@@ -38,6 +38,7 @@ const setLoading = (target, isLoading, message) => {
     target.textContent = message;
   }
   target.classList.toggle("hidden", !isLoading);
+  target.style.display = isLoading ? "inline-flex" : "none";
 };
 
 const setButtonBusy = (button, busyText, isBusy) => {
@@ -170,6 +171,7 @@ const openDishModal = async (dishId) => {
     showModalError("Failed to load details.");
   } finally {
     ui.modalLoading.classList.add("hidden");
+    ui.modalLoading.style.display = "none";
   }
 };
 
