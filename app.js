@@ -115,7 +115,23 @@ const openDishModal = async (dishId) => {
   setLoading(ui.modalLoading, true, "Loading details...");
 
   try {
-    const res = await fetch(`/api/ulam-detail?id=${encodeURIComponent(dishId)}`);
+    if (!dishId) {
+      setLoading(ui.modalLoading, true, "Missing dish id.");
+      return;
+    }
+
+    const res = await fetch(`/api/ulam-detail?id=${encodeURIComponent(dishId)}`, {
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-store"
+      }
+    });
+
+    if (!res.ok) {
+      setLoading(ui.modalLoading, true, "Failed to load details.");
+      return;
+    }
+
     const data = await res.json();
     if (!data || !data.item) {
       setLoading(ui.modalLoading, true, "No details found.");
