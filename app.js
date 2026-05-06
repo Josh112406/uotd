@@ -181,7 +181,7 @@ const loadProfile = async () => {
     .from("profiles")
     .select("display_name,budget_per_meal,kcal_target,diet_tags")
     .eq("user_id", state.session.user.id)
-    .single();
+    .maybeSingle();
 
   if (error || !data) {
     return;
