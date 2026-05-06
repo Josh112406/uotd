@@ -119,9 +119,15 @@ const openDishModal = async (dishId) => {
   ui.modalBody.classList.add("hidden");
   setLoading(ui.modalLoading, true, "Loading details...");
 
+  const showModalError = (message) => {
+    ui.modalMeta.textContent = message;
+    ui.modalBody.classList.add("hidden");
+    setLoading(ui.modalLoading, false);
+  };
+
   try {
     if (!dishId) {
-      ui.modalMeta.textContent = "Missing dish id.";
+      showModalError("Missing dish id.");
       return;
     }
 
@@ -137,13 +143,13 @@ const openDishModal = async (dishId) => {
     clearTimeout(timeout);
 
     if (!res.ok) {
-      ui.modalMeta.textContent = "Failed to load details.";
+      showModalError("Failed to load details.");
       return;
     }
 
     const data = await res.json();
     if (!data || !data.item) {
-      ui.modalMeta.textContent = "No details found.";
+      showModalError("No details found.");
       return;
     }
 
@@ -161,9 +167,9 @@ const openDishModal = async (dishId) => {
     setLoading(ui.modalLoading, false);
     ui.modalBody.classList.remove("hidden");
   } catch (error) {
-    ui.modalMeta.textContent = "Failed to load details.";
+    showModalError("Failed to load details.");
   } finally {
-    setLoading(ui.modalLoading, false);
+    ui.modalLoading.classList.add("hidden");
   }
 };
 
