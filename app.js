@@ -1,5 +1,5 @@
 const config = window.UOTD_CONFIG || {};
-const supabase = window.supabase.createClient(
+const supabaseClient = window.supabase.createClient(
   config.supabaseUrl || "",
   config.supabaseAnonKey || ""
 );
@@ -73,7 +73,7 @@ const renderResults = (target, items, mode) => {
 };
 
 const ensureSession = async () => {
-  const { data } = await supabase.auth.getSession();
+  const { data } = await supabaseClient.auth.getSession();
   state.session = data.session || null;
   updateAuthStatus();
   setHomeView(Boolean(state.session));
@@ -93,7 +93,7 @@ const loadProfile = async () => {
     return;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("profiles")
     .select("display_name,budget_per_meal,kcal_target,diet_tags")
     .eq("user_id", state.session.user.id)
@@ -156,7 +156,7 @@ const setupHandlers = () => {
     if (!email || !password) {
       return;
     }
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabaseClient.auth.signUp({ email, password });
     if (error) {
       ui.authMessage.textContent = error.message;
       return;
@@ -170,7 +170,7 @@ const setupHandlers = () => {
     if (!email || !password) {
       return;
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
     if (error) {
       ui.authMessage.textContent = error.message;
       return;
@@ -182,7 +182,7 @@ const setupHandlers = () => {
   });
 
   el("btnSignOut").addEventListener("click", async () => {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     await ensureSession();
   });
 
@@ -201,7 +201,7 @@ const setupHandlers = () => {
         .filter(Boolean)
     };
 
-    await supabase.from("profiles").upsert(payload);
+    await supabaseClient.from("profiles").upsert(payload);
   });
 
   el("btnAddPantry").addEventListener("click", async () => {
