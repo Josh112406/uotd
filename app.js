@@ -108,6 +108,10 @@ const renderResults = (target, items, mode) => {
 };
 
 const openDishModal = async (dishId) => {
+  if (!state.session) {
+    ui.authMessage.textContent = "Please sign in to view dish details.";
+    return;
+  }
   ui.modal.classList.remove("hidden");
   ui.modalTitle.textContent = "Dish details";
   ui.modalMeta.textContent = "";
