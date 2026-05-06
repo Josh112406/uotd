@@ -107,6 +107,28 @@ body.landing .auth-card {
   font-size: 14px;
 }
 
+.loading {
+  margin: 10px 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(21, 111, 59, 0.08);
+  color: #1e3c2b;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loading::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(21, 111, 59, 0.3);
+  border-top-color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+
 
 .tabs {
   display: flex;
@@ -199,11 +221,67 @@ button.ghost {
   border-radius: 12px;
   background: #fff;
   border: 1px solid var(--border);
+  display: grid;
+  gap: 6px;
 }
 
 .result-card h3 {
   margin: 0 0 6px;
   font-size: 18px;
+}
+
+.result-card .dish-link {
+  justify-self: start;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 8, 6, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.modal-card {
+  width: min(680px, 92vw);
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 20px 22px 24px;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(10, 20, 12, 0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  color: var(--ink);
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-meta {
+  margin: 0 0 12px;
+  color: #5c5c5c;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 720px) {
