@@ -7,7 +7,8 @@ const supabaseClient = window.supabase.createClient(
 const el = (id) => document.getElementById(id);
 
 const state = {
-  session: null
+  session: null,
+  modalBusy: false
 };
 
 const ui = {
@@ -109,16 +110,35 @@ const renderResults = (target, items, mode) => {
     .join("");
 };
 
+const resetModal = () => {
+  ui.modal.classList.remove("hidden");
+  ui.modalTitle.textContent = "Dish details";
+  ui.modalMeta.textContent = "";
+  ui.modalBody.classList.add("hidden");
+  ui.modalBody.style.display = "none";
+  ui.modalLoading.classList.remove("hidden");
+  ui.modalLoading.textContent = "Loading details...";
+  ui.modalLoading.style.display = "inline-flex";
+};
+
+const hideModal = () => {
+  ui.modal.classList.add("hidden");
+  ui.modalBody.classList.add("hidden");
+  ui.modalBody.style.display = "none";
+  ui.modalLoading.classList.add("hidden");
+  ui.modalLoading.style.display = "none";
+};
+
 const openDishModal = async (dishId) => {
   if (!state.session) {
     ui.authMessage.textContent = "Please sign in to view dish details.";
     return;
   }
-  ui.modal.classList.remove("hidden");
-  ui.modalTitle.textContent = "Dish details";
-  ui.modalMeta.textContent = "";
-  ui.modalBody.classList.add("hidden");
-  setLoading(ui.modalLoading, true, "Loading details...");
+  if (state.modalBusy) {
+    return;
+  }
+  state.modalBusy = true;
+  resetModal();
 
   const showModalError = (message) => {
     ui.modalMeta.textContent = message;
@@ -183,6 +203,7 @@ const openDishModal = async (dishId) => {
   } finally {
     ui.modalLoading.classList.add("hidden");
     ui.modalLoading.style.display = "none";
+    state.modalBusy = false;
   }
 };
 
@@ -225,13 +246,23 @@ const loadProfile = async () => {
 
 const loadPantry = async () => {
   setLoading(ui.pantryLoading, true, "Loading pantry...");
-  const res = await fetch("/api/pantry-list", {
-    headers: {
-      "Content-Type": "application/json",
-      ...getAuthHeader()
+  let data = { items: [] };
+  try {
+    const res = await fetch(`/api/pantry-list?_=${Date.now()}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+        ...getAuthHeader()
+      }
+    });
+    if (!res.ok) {
+      throw new Error("Failed to load pantry.");
     }
-  });
-  const data = await res.json();
+    data = await res.json();
+  } catch (error) {
+    const list = el("pantryList");
+    list.innerHTML = "<li>Failed to load pantry.</li>";
+  }
 
   const list = el("pantryList");
   list.innerHTML = "";
@@ -267,16 +298,16 @@ const setupHandlers = () => {
   });
 
   ui.closeModal.addEventListener("click", () => {
-    ui.modal.classList.add("hidden");
+    hideModal();
   });
   ui.modal.addEventListener("click", (event) => {
     if (event.target === ui.modal) {
-      ui.modal.classList.add("hidden");
+      hideModal();
     }
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !ui.modal.classList.contains("hidden")) {
-      ui.modal.classList.add("hidden");
+      hideModal();
     }
   });
 
@@ -318,6 +349,7 @@ const setupHandlers = () => {
   el("btnSignOut").addEventListener("click", async () => {
     await supabaseClient.auth.signOut();
     await ensureSession();
+    hideModal();
   });
 
   el("btnSaveProfile").addEventListener("click", async () => {
@@ -348,18 +380,26 @@ const setupHandlers = () => {
     }
     setLoading(ui.pantryLoading, true, "Adding ingredient...");
 
-    await fetch("/api/pantry-add", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
-      },
-      body: JSON.stringify({
-        ingredient_name: ingredientName,
-        quantity: Number(el("pantryQty").value || 0),
-        unit: el("pantryUnit").value.trim()
-      })
-    });
+    try {
+      const res = await fetch(`/api/pantry-add?_=${Date.now()}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({
+          ingredient_name: ingredientName,
+          quantity: Number(el("pantryQty").value || 0),
+          unit: el("pantryUnit").value.trim()
+        })
+      });
+      if (!res.ok) {
+        throw new Error("Failed to add ingredient.");
+      }
+    } catch (error) {
+      setLoading(ui.pantryLoading, true, "Failed to add ingredient.");
+    }
 
     el("pantryName").value = "";
     el("pantryQty").value = "";
@@ -372,33 +412,58 @@ const setupHandlers = () => {
   el("btnSearch").addEventListener("click", async () => {
     const ingredients = el("ingredientSearch").value.trim();
     setLoading(ui.searchLoading, true, "Searching...");
-    const res = await fetch(`/api/ulam-search?ingredients=${encodeURIComponent(ingredients)}`);
-    const data = await res.json();
-    renderResults(el("searchResults"), data.items, "forward");
-    setLoading(ui.searchLoading, false);
+    try {
+      const res = await fetch(`/api/ulam-search?ingredients=${encodeURIComponent(ingredients)}&_=${Date.now()}`);
+      if (!res.ok) {
+        throw new Error("Search failed.");
+      }
+      const data = await res.json();
+      renderResults(el("searchResults"), data.items, "forward");
+    } catch (error) {
+      el("searchResults").innerHTML = "<p>Search failed. Try again.</p>";
+    } finally {
+      setLoading(ui.searchLoading, false);
+    }
   });
 
   el("btnReverse").addEventListener("click", async () => {
     const dish = el("dishSearch").value.trim();
     setLoading(ui.searchLoading, true, "Searching dish...");
-    const res = await fetch(`/api/ulam-reverse?dish=${encodeURIComponent(dish)}`);
-    const data = await res.json();
-    renderResults(el("searchResults"), data.items, "reverse");
-    setLoading(ui.searchLoading, false);
+    try {
+      const res = await fetch(`/api/ulam-reverse?dish=${encodeURIComponent(dish)}&_=${Date.now()}`);
+      if (!res.ok) {
+        throw new Error("Reverse search failed.");
+      }
+      const data = await res.json();
+      renderResults(el("searchResults"), data.items, "reverse");
+    } catch (error) {
+      el("searchResults").innerHTML = "<p>Search failed. Try again.</p>";
+    } finally {
+      setLoading(ui.searchLoading, false);
+    }
   });
 
   el("btnSuggest").addEventListener("click", async () => {
     const mode = el("suggestMode").value;
     setLoading(ui.suggestLoading, true, "Finding matches...");
-    const res = await fetch(`/api/ulam-suggest?mode=${encodeURIComponent(mode)}` , {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
+    try {
+      const res = await fetch(`/api/ulam-suggest?mode=${encodeURIComponent(mode)}&_=${Date.now()}` , {
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) {
+        throw new Error("Suggestion failed.");
       }
-    });
-    const data = await res.json();
-    renderResults(el("suggestions"), data.items, "forward");
-    setLoading(ui.suggestLoading, false);
+      const data = await res.json();
+      renderResults(el("suggestions"), data.items, "forward");
+    } catch (error) {
+      el("suggestions").innerHTML = "<p>Suggestions failed. Try again.</p>";
+    } finally {
+      setLoading(ui.suggestLoading, false);
+    }
   });
 
   el("searchResults").addEventListener("click", (event) => {
