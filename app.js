@@ -13,7 +13,6 @@ const state = {
 const ui = {
   authCard: document.getElementById("authCard"),
   authMessage: document.getElementById("authMessage"),
-  gallery: document.getElementById("dishGallery"),
   appShell: document.getElementById("appShell"),
   tabButtons: Array.from(document.querySelectorAll(".tab-btn")),
   panels: Array.from(document.querySelectorAll(".panel"))
@@ -28,12 +27,10 @@ const setHomeView = (signedIn) => {
   if (signedIn) {
     document.body.classList.remove("landing");
     ui.authCard.classList.add("hidden");
-    ui.gallery.classList.add("hidden");
     ui.appShell.classList.remove("hidden");
   } else {
     document.body.classList.add("landing");
     ui.authCard.classList.remove("hidden");
-    ui.gallery.classList.remove("hidden");
     ui.appShell.classList.add("hidden");
   }
 };

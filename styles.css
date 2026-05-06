@@ -107,19 +107,6 @@ body.landing .auth-card {
   font-size: 14px;
 }
 
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-.gallery img {
-  width: 100%;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  background: #fff;
-  box-shadow: 0 12px 24px rgba(20, 30, 18, 0.08);
-}
 
 .tabs {
   display: flex;
