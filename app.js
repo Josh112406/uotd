@@ -121,13 +121,13 @@ const openDishModal = async (dishId) => {
 
   try {
     if (!dishId) {
-      setLoading(ui.modalLoading, true, "Missing dish id.");
+      ui.modalMeta.textContent = "Missing dish id.";
       return;
     }
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
-    const res = await fetch(`/api/ulam-detail?id=${encodeURIComponent(dishId)}`, {
+    const res = await fetch(`/api/ulam-detail?id=${encodeURIComponent(dishId)}&_=${Date.now()}`, {
       cache: "no-store",
       headers: {
         "Cache-Control": "no-store"
@@ -137,13 +137,13 @@ const openDishModal = async (dishId) => {
     clearTimeout(timeout);
 
     if (!res.ok) {
-      setLoading(ui.modalLoading, true, "Failed to load details.");
+      ui.modalMeta.textContent = "Failed to load details.";
       return;
     }
 
     const data = await res.json();
     if (!data || !data.item) {
-      setLoading(ui.modalLoading, true, "No details found.");
+      ui.modalMeta.textContent = "No details found.";
       return;
     }
 
@@ -161,7 +161,9 @@ const openDishModal = async (dishId) => {
     setLoading(ui.modalLoading, false);
     ui.modalBody.classList.remove("hidden");
   } catch (error) {
-    setLoading(ui.modalLoading, true, "Failed to load details.");
+    ui.modalMeta.textContent = "Failed to load details.";
+  } finally {
+    setLoading(ui.modalLoading, false);
   }
 };
 

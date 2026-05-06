@@ -55,6 +55,7 @@ const callGemini = async (dish) => {
 
 module.exports = async (req, res) => {
   try {
+    res.setHeader("Cache-Control", "no-store, max-age=0");
     const ulam = readJson("ulam.json");
     const id = normalize(req.query.id || "");
     const dish = ulam.find((item) => normalize(item.id) === id);
