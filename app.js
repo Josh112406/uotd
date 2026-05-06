@@ -89,12 +89,13 @@ const renderResults = (target, items, mode) => {
 
   target.innerHTML = items
     .map((item) => {
-      const lockId = String(item.id || item.name).length + (item.kcalPerServing || 100);
-      const imgUrl = `https://loremflickr.com/400/300/food,dish?lock=${lockId}`;
+      // Using an AI image generation endpoint to get accurate Filipino food photos dynamically
+      const cleanName = encodeURIComponent(item.name + " filipino food realistic high quality");
+      const imgUrl = `https://image.pollinations.ai/prompt/${cleanName}?width=400&height=300&nologo=true`;
 
       if (mode === "reverse") {
         return `
-          <div class="result-card">
+          <div class="result-card clickable-card" data-id="${item.id}">
             <div class="img-wrapper">
               <img src="${imgUrl}" alt="${item.name}" loading="lazy"/>
             </div>
@@ -112,7 +113,7 @@ const renderResults = (target, items, mode) => {
       else if (matchRatio >= 0.4) matchClass = "match-med";
 
       return `
-        <div class="result-card">
+        <div class="result-card clickable-card" data-id="${item.id}">
           <div class="img-wrapper">
             <img src="${imgUrl}" alt="${item.name}" loading="lazy"/>
           </div>
@@ -123,11 +124,12 @@ const renderResults = (target, items, mode) => {
               <span class="badge">${item.kcalPerServing} kcal</span>
               <span class="badge ${matchClass}">${item.matchCount}/${item.totalIngredients} Match</span>
             </div>
-            <div style="flex-grow: 1;"></div>
-            ${state.session
-              ? `<button class="dish-link" data-id="${item.id}">View details</button>`
-              : `<button class="dish-link" data-id="${item.id}" disabled>Sign in to view</button>`
-            }
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+};
           </div>
         </div>
       `;
@@ -513,19 +515,19 @@ const setupHandlers = () => {
   });
 
   el("searchResults").addEventListener("click", (event) => {
-    const button = event.target.closest(".dish-link");
-    if (!button) {
+    const card = event.target.closest(".clickable-card");
+    if (!card) {
       return;
     }
-    openDishModal(button.dataset.id);
+    openDishModal(card.dataset.id);
   });
 
   el("suggestions").addEventListener("click", (event) => {
-    const button = event.target.closest(".dish-link");
-    if (!button) {
+    const card = event.target.closest(".clickable-card");
+    if (!card) {
       return;
     }
-    openDishModal(button.dataset.id);
+    openDishModal(card.dataset.id);
   });
 };
 
