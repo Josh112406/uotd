@@ -175,7 +175,9 @@ const openDishModal = async (dishId) => {
     ui.modalSteps.innerHTML = steps.map((step) => `<li>${step}</li>`).join("");
 
     setLoading(ui.modalLoading, false);
+    ui.modalLoading.style.display = "none";
     ui.modalBody.classList.remove("hidden");
+    ui.modalBody.style.display = "block";
   } catch (error) {
     showModalError("Failed to load details.");
   } finally {
