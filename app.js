@@ -103,7 +103,10 @@ const renderResults = (target, items, mode) => {
           <h3>${item.name}</h3>
           <p>Cost: PHP ${item.estimatedCost.toFixed(2)} | Kcal: ${item.kcalPerServing}</p>
           <p>Pantry match: ${item.matchCount}/${item.totalIngredients}</p>
-          <button class="dish-link" data-id="${item.id}">View details</button>
+          ${state.session
+            ? `<button class="dish-link" data-id="${item.id}">View details</button>`
+            : `<button class="dish-link" data-id="${item.id}" disabled>Sign in to view</button>`
+          }
         </div>
       `;
     })
@@ -291,6 +294,15 @@ const loadPantry = async () => {
 };
 
 const setupHandlers = () => {
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    state.session = session || null;
+    updateAuthStatus();
+    setHomeView(Boolean(state.session));
+    if (!state.session) {
+      hideModal();
+    }
+  });
+
   ui.tabButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       setActivePanel(btn.dataset.target);
