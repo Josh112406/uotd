@@ -148,7 +148,14 @@ const openDishModal = async (dishId) => {
       return;
     }
 
-    const data = await res.json();
+    const raw = await res.text();
+    let data = null;
+    try {
+      data = JSON.parse(raw);
+    } catch (parseError) {
+      showModalError("Invalid response from server.");
+      return;
+    }
     if (!data || !data.item) {
       showModalError("No details found.");
       return;
@@ -157,13 +164,15 @@ const openDishModal = async (dishId) => {
     ui.modalTitle.textContent = data.item.name;
     ui.modalMeta.textContent = `Servings: ${data.item.servings} | Kcal: ${data.item.kcalPerServing}`;
 
-    ui.modalIngredients.innerHTML = data.item.ingredients
-      .map((ing) => `<li>${ing.name} - ${ing.quantity} ${ing.unit}</li>`)
-      .join("");
+    const ingredients = Array.isArray(data.item.ingredients) ? data.item.ingredients : [];
+    ui.modalIngredients.innerHTML = ingredients.length
+      ? ingredients.map((ing) => `<li>${ing.name} - ${ing.quantity} ${ing.unit}</li>`).join("")
+      : "<li>No ingredients listed.</li>";
 
-    ui.modalSteps.innerHTML = (data.item.steps || ["Steps coming soon."])
-      .map((step) => `<li>${step}</li>`)
-      .join("");
+    const steps = Array.isArray(data.item.steps) && data.item.steps.length
+      ? data.item.steps
+      : ["Steps coming soon."];
+    ui.modalSteps.innerHTML = steps.map((step) => `<li>${step}</li>`).join("");
 
     setLoading(ui.modalLoading, false);
     ui.modalBody.classList.remove("hidden");
