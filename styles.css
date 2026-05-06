@@ -243,6 +243,7 @@ button.ghost {
   justify-content: center;
   padding: 24px;
   z-index: 50;
+  pointer-events: auto;
 }
 
 .modal-card {
@@ -252,6 +253,7 @@ button.ghost {
   padding: 20px 22px 24px;
   position: relative;
   box-shadow: 0 20px 40px rgba(10, 20, 12, 0.2);
+  pointer-events: auto;
 }
 
 .modal-close {
@@ -264,6 +266,7 @@ button.ghost {
   font-size: 24px;
   line-height: 1;
   cursor: pointer;
+  z-index: 2;
 }
 
 .modal-meta {

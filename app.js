@@ -120,12 +120,16 @@ const openDishModal = async (dishId) => {
       return;
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
     const res = await fetch(`/api/ulam-detail?id=${encodeURIComponent(dishId)}`, {
       cache: "no-store",
       headers: {
         "Cache-Control": "no-store"
-      }
+      },
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
     if (!res.ok) {
       setLoading(ui.modalLoading, true, "Failed to load details.");
@@ -241,6 +245,11 @@ const setupHandlers = () => {
   });
   ui.modal.addEventListener("click", (event) => {
     if (event.target === ui.modal) {
+      ui.modal.classList.add("hidden");
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !ui.modal.classList.contains("hidden")) {
       ui.modal.classList.add("hidden");
     }
   });
