@@ -58,9 +58,19 @@
         <section class="card panel" id="pantryPanel">
           <h2>Pantry</h2>
           <div class="grid">
-            <input id="pantryName" placeholder="Ingredient name" />
-            <input id="pantryQty" type="number" placeholder="Quantity" />
-            <input id="pantryUnit" placeholder="Unit (g, ml, pcs)" />
+            <input id="pantryName" placeholder="Ingredient name" maxlength="50" pattern="[A-Za-z\s\-]+" title="Only letters, spaces, and hyphens allowed" />
+            <input id="pantryQty" type="number" placeholder="Quantity" min="0.1" step="0.1" />
+            <select id="pantryUnit">
+              <option value="" disabled selected>Unit</option>
+              <option value="g">Gram (g)</option>
+              <option value="kg">Kilogram (kg)</option>
+              <option value="ml">Milliliter (ml)</option>
+              <option value="l">Liter (l)</option>
+              <option value="pcs">Pieces (pcs)</option>
+              <option value="cups">Cups</option>
+              <option value="tbsp">Tbsp</option>
+              <option value="tsp">Tsp</option>
+            </select>
           </div>
           <div class="row">
             <button id="btnAddPantry">Add ingredient</button>

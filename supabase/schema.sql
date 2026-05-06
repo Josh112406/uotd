@@ -38,3 +38,18 @@ create policy "Pantry is user owned" on pantry_items
 
 create policy "Suggestions are user owned" on saved_suggestions
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create table if not exists dishes (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  kcal_per_serving integer,
+  ingredients jsonb,
+  steps text[],
+  servings integer,
+  diet_tags text[] default '{}',
+  created_at timestamptz default now()
+);
+
+alter table dishes enable row level security;
+create policy "Dishes are viewable by everyone" on dishes for select using (true);
+create policy "Dishes are insertable by authenticated" on dishes for insert with check (auth.role() = 'authenticated');

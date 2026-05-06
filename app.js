@@ -387,9 +387,21 @@ const setupHandlers = () => {
 
   el("btnAddPantry").addEventListener("click", async () => {
     const ingredientName = el("pantryName").value.trim();
-    if (!ingredientName) {
+    const qty = Number(el("pantryQty").value || 0);
+    const unit = el("pantryUnit").value.trim();
+
+    if (!ingredientName || qty <= 0 || !unit) {
+      setLoading(ui.pantryLoading, true, "Please provide a valid name, quantity (>0), and select a unit.");
+      setTimeout(() => setLoading(ui.pantryLoading, false), 2500);
       return;
     }
+
+    if (!/^[A-Za-z\s\-]+$/.test(ingredientName)) {
+      setLoading(ui.pantryLoading, true, "Ingredient name can only contain letters, spaces, and hyphens.");
+      setTimeout(() => setLoading(ui.pantryLoading, false), 2500);
+      return;
+    }
+
     setLoading(ui.pantryLoading, true, "Adding ingredient...");
 
     try {
@@ -402,8 +414,8 @@ const setupHandlers = () => {
         },
         body: JSON.stringify({
           ingredient_name: ingredientName,
-          quantity: Number(el("pantryQty").value || 0),
-          unit: el("pantryUnit").value.trim()
+          quantity: qty,
+          unit: unit
         })
       });
       if (!res.ok) {
