@@ -66,6 +66,7 @@ const setHomeView = (signedIn) => {
     document.body.classList.add("landing");
     ui.authCard.classList.remove("hidden");
     ui.appShell.classList.add("hidden");
+    ui.modal.classList.add("hidden");
   }
 };
 
