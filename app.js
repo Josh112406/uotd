@@ -10,9 +10,41 @@ const state = {
   session: null
 };
 
+const ui = {
+  authCard: document.getElementById("authCard"),
+  authMessage: document.getElementById("authMessage"),
+  gallery: document.getElementById("dishGallery"),
+  appShell: document.getElementById("appShell"),
+  tabButtons: Array.from(document.querySelectorAll(".tab-btn")),
+  panels: Array.from(document.querySelectorAll(".panel"))
+};
+
 const updateAuthStatus = () => {
   const status = el("authStatus");
   status.textContent = state.session ? "Signed in" : "Not signed in";
+};
+
+const setHomeView = (signedIn) => {
+  if (signedIn) {
+    document.body.classList.remove("landing");
+    ui.authCard.classList.add("hidden");
+    ui.gallery.classList.add("hidden");
+    ui.appShell.classList.remove("hidden");
+  } else {
+    document.body.classList.add("landing");
+    ui.authCard.classList.remove("hidden");
+    ui.gallery.classList.remove("hidden");
+    ui.appShell.classList.add("hidden");
+  }
+};
+
+const setActivePanel = (panelId) => {
+  ui.panels.forEach((panel) => {
+    panel.classList.toggle("active", panel.id === panelId);
+  });
+  ui.tabButtons.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.target === panelId);
+  });
 };
 
 const renderResults = (target, items, mode) => {
@@ -47,6 +79,7 @@ const ensureSession = async () => {
   const { data } = await supabase.auth.getSession();
   state.session = data.session || null;
   updateAuthStatus();
+  setHomeView(Boolean(state.session));
 };
 
 const getAuthHeader = () => {
@@ -114,14 +147,24 @@ const loadPantry = async () => {
 };
 
 const setupHandlers = () => {
+  ui.tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setActivePanel(btn.dataset.target);
+    });
+  });
+
   el("btnSignUp").addEventListener("click", async () => {
     const email = el("email").value.trim();
     const password = el("password").value.trim();
     if (!email || !password) {
       return;
     }
-    await supabase.auth.signUp({ email, password });
-    await ensureSession();
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      ui.authMessage.textContent = error.message;
+      return;
+    }
+    ui.authMessage.textContent = "Check your email to confirm sign up, then sign in.";
   });
 
   el("btnSignIn").addEventListener("click", async () => {
@@ -130,7 +173,12 @@ const setupHandlers = () => {
     if (!email || !password) {
       return;
     }
-    await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      ui.authMessage.textContent = error.message;
+      return;
+    }
+    ui.authMessage.textContent = "";
     await ensureSession();
     await loadProfile();
     await loadPantry();
@@ -219,4 +267,5 @@ ensureSession().then(() => {
     loadProfile();
     loadPantry();
   }
+  setActivePanel("searchPanel");
 });

@@ -10,7 +10,7 @@
   </head>
   <body>
     <main class="app">
-      <header class="hero">
+      <header class="hero" id="heroHeader">
         <div>
           <p class="eyebrow">Ulam Of The Day</p>
           <h1>Cook smart, spend less, eat better.</h1>
@@ -19,7 +19,7 @@
         <div class="status" id="authStatus">Not signed in</div>
       </header>
 
-      <section class="card">
+      <section class="card auth-card" id="authCard">
         <h2>Sign in</h2>
         <div class="grid">
           <input id="email" type="email" placeholder="Email" />
@@ -30,56 +30,72 @@
           <button id="btnSignIn">Sign in</button>
           <button id="btnSignOut" class="ghost">Sign out</button>
         </div>
+        <p id="authMessage" class="message"></p>
       </section>
 
-      <section class="card">
-        <h2>Profile</h2>
-        <div class="grid">
-          <input id="displayName" placeholder="Display name" />
-          <input id="budget" type="number" placeholder="Budget per meal (PHP)" />
-          <input id="kcal" type="number" placeholder="Kcal target per meal" />
-          <input id="dietTags" placeholder="Diet tags (comma separated)" />
-        </div>
-        <button id="btnSaveProfile">Save profile</button>
+      <section class="gallery" id="dishGallery">
+        <img src="assets/ulam-1.svg" alt="Chicken adobo illustration" />
+        <img src="assets/ulam-2.svg" alt="Sinigang illustration" />
+        <img src="assets/ulam-3.svg" alt="Vegetable ulam illustration" />
       </section>
 
-      <section class="card">
-        <h2>Pantry</h2>
-        <div class="grid">
-          <input id="pantryName" placeholder="Ingredient name" />
-          <input id="pantryQty" type="number" placeholder="Quantity" />
-          <input id="pantryUnit" placeholder="Unit (g, ml, pcs)" />
+      <section class="app-shell hidden" id="appShell">
+        <div class="tabs">
+          <button class="tab-btn active" data-target="searchPanel">Search</button>
+          <button class="tab-btn" data-target="pantryPanel">Pantry</button>
+          <button class="tab-btn" data-target="profilePanel">Profile</button>
+          <button class="tab-btn" data-target="suggestPanel">Suggestions</button>
         </div>
-        <div class="row">
-          <button id="btnAddPantry">Add ingredient</button>
-          <button id="btnRefreshPantry" class="ghost">Refresh</button>
-        </div>
-        <ul id="pantryList" class="list"></ul>
-      </section>
 
-      <section class="card">
-        <h2>Search</h2>
-        <div class="grid">
-          <input id="ingredientSearch" placeholder="Ingredients (comma separated)" />
-          <input id="dishSearch" placeholder="Dish name" />
-        </div>
-        <div class="row">
-          <button id="btnSearch">Search by ingredients</button>
-          <button id="btnReverse" class="ghost">Reverse search</button>
-        </div>
-        <div id="searchResults" class="results"></div>
-      </section>
+        <section class="card panel active" id="searchPanel">
+          <h2>Search</h2>
+          <div class="grid">
+            <input id="ingredientSearch" placeholder="Ingredients (comma separated)" />
+            <input id="dishSearch" placeholder="Dish name" />
+          </div>
+          <div class="row">
+            <button id="btnSearch">Search by ingredients</button>
+            <button id="btnReverse" class="ghost">Reverse search</button>
+          </div>
+          <div id="searchResults" class="results"></div>
+        </section>
 
-      <section class="card">
-        <h2>Suggestions</h2>
-        <div class="row">
-          <select id="suggestMode">
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-          </select>
-          <button id="btnSuggest">Get suggestions</button>
-        </div>
-        <div id="suggestions" class="results"></div>
+        <section class="card panel" id="pantryPanel">
+          <h2>Pantry</h2>
+          <div class="grid">
+            <input id="pantryName" placeholder="Ingredient name" />
+            <input id="pantryQty" type="number" placeholder="Quantity" />
+            <input id="pantryUnit" placeholder="Unit (g, ml, pcs)" />
+          </div>
+          <div class="row">
+            <button id="btnAddPantry">Add ingredient</button>
+            <button id="btnRefreshPantry" class="ghost">Refresh</button>
+          </div>
+          <ul id="pantryList" class="list"></ul>
+        </section>
+
+        <section class="card panel" id="profilePanel">
+          <h2>Profile</h2>
+          <div class="grid">
+            <input id="displayName" placeholder="Display name" />
+            <input id="budget" type="number" placeholder="Budget per meal (PHP)" />
+            <input id="kcal" type="number" placeholder="Kcal target per meal" />
+            <input id="dietTags" placeholder="Diet tags (comma separated)" />
+          </div>
+          <button id="btnSaveProfile">Save profile</button>
+        </section>
+
+        <section class="card panel" id="suggestPanel">
+          <h2>Suggestions</h2>
+          <div class="row">
+            <select id="suggestMode">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+            </select>
+            <button id="btnSuggest">Get suggestions</button>
+          </div>
+          <div id="suggestions" class="results"></div>
+        </section>
       </section>
     </main>
 

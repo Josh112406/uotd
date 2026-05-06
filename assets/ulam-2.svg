@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+  <rect width="640" height="420" fill="#fff7ea" />
+  <ellipse cx="320" cy="250" rx="160" ry="120" fill="#f2ede4" stroke="#e5d7c5" stroke-width="6" />
+  <ellipse cx="320" cy="250" rx="120" ry="85" fill="#f5b98a" />
+  <circle cx="270" cy="230" r="20" fill="#e1602d" />
+  <circle cx="355" cy="270" r="18" fill="#7bb04a" />
+  <circle cx="390" cy="225" r="14" fill="#f2e277" />
+  <path d="M300 140c10-30 40-30 50 0" fill="none" stroke="#7d6b57" stroke-width="10" stroke-linecap="round" />
+  <text x="60" y="380" font-size="20" fill="#7d6b57" font-family="sans-serif">Sinigang</text>
+</svg>
