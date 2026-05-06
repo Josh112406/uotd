@@ -213,25 +213,90 @@ button.ghost {
 
 .results {
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
 }
 
 .result-card {
-  padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: 16px;
   background: #fff;
   border: 1px solid var(--border);
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.result-card h3 {
-  margin: 0 0 6px;
+.result-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.result-card .img-wrapper {
+  width: 100%;
+  height: 180px;
+  background: #f4f5f4;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-card .img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 12px;
+}
+
+.card-content h3 {
+  margin: 0;
   font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
 }
 
-.result-card .dish-link {
-  justify-self: start;
+.badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #f0f2f0;
+  color: #4b5b4e;
+  white-space: nowrap;
+}
+
+.badge.match-high {
+  background: #e6f4ea;
+  color: #2e7d32;
+}
+
+.badge.match-med {
+  background: #fff4e5;
+  color: #c86900;
+}
+
+.badge.match-low {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.card-content .dish-link {
+  margin-top: auto;
+  width: 100%;
 }
 
 .modal {

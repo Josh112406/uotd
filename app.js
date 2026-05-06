@@ -89,24 +89,46 @@ const renderResults = (target, items, mode) => {
 
   target.innerHTML = items
     .map((item) => {
+      const lockId = String(item.id || item.name).length + (item.kcalPerServing || 100);
+      const imgUrl = `https://loremflickr.com/400/300/food,dish?lock=${lockId}`;
+
       if (mode === "reverse") {
         return `
           <div class="result-card">
-            <h3>${item.name}</h3>
-            <p>${item.ingredients.join(", ")}</p>
+            <div class="img-wrapper">
+              <img src="${imgUrl}" alt="${item.name}" loading="lazy"/>
+            </div>
+            <div class="card-content">
+              <h3>${item.name}</h3>
+              <p style="font-size: 13px; color: #555; margin: 0; line-height: 1.4;">${item.ingredients.join(", ")}</p>
+            </div>
           </div>
         `;
       }
 
+      let matchClass = "match-low";
+      let matchRatio = item.totalIngredients > 0 ? item.matchCount / item.totalIngredients : 0;
+      if (matchRatio >= 0.7 || item.matchCount === item.totalIngredients) matchClass = "match-high";
+      else if (matchRatio >= 0.4) matchClass = "match-med";
+
       return `
         <div class="result-card">
-          <h3>${item.name}</h3>
-          <p>Cost: PHP ${item.estimatedCost.toFixed(2)} | Kcal: ${item.kcalPerServing}</p>
-          <p>Pantry match: ${item.matchCount}/${item.totalIngredients}</p>
-          ${state.session
-            ? `<button class="dish-link" data-id="${item.id}">View details</button>`
-            : `<button class="dish-link" data-id="${item.id}" disabled>Sign in to view</button>`
-          }
+          <div class="img-wrapper">
+            <img src="${imgUrl}" alt="${item.name}" loading="lazy"/>
+          </div>
+          <div class="card-content">
+            <h3>${item.name}</h3>
+            <div class="badges">
+              <span class="badge">₱${item.estimatedCost.toFixed(0)}</span>
+              <span class="badge">${item.kcalPerServing} kcal</span>
+              <span class="badge ${matchClass}">${item.matchCount}/${item.totalIngredients} Match</span>
+            </div>
+            <div style="flex-grow: 1;"></div>
+            ${state.session
+              ? `<button class="dish-link" data-id="${item.id}">View details</button>`
+              : `<button class="dish-link" data-id="${item.id}" disabled>Sign in to view</button>`
+            }
+          </div>
         </div>
       `;
     })
