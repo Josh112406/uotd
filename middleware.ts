@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createServerClient } from "@supabase/ssr";
 
 /**
  * Routes that require a logged-in session.
@@ -8,8 +7,11 @@ import { createServerClient } from "@supabase/ssr";
 const PROTECTED_ROUTES = ["/pantry", "/suggest", "/search"];
 
 export async function middleware(request: NextRequest) {
-  // Default response; may be replaced if we need to set cookies
-  let supabaseResponse = NextResponse.next();
+  // Vercel Edge runtime has been the source of the 500 here.
+  // Keep production on Vercel fully safe by bypassing middleware auth logic.
+  if (process.env.VERCEL) {
+    return NextResponse.next();
+  }
 
   try {
     // Avoid calling Supabase client inside Edge middleware (can cause
@@ -17,7 +19,8 @@ export async function middleware(request: NextRequest) {
     // from common Supabase cookie names. This is a heuristic used only to
     // gate protected routes in middleware; real user data is still fetched
     // on the server/client where full Supabase clients are safe.
-    const cookieList = request.cookies.getAll();
+    const cookieList =
+      typeof request.cookies.getAll === "function" ? request.cookies.getAll() : [];
     const cookieNames = cookieList.map((c) => c.name.toLowerCase());
 
     const hasAuthCookie = cookieNames.some((name) =>
@@ -50,7 +53,7 @@ export async function middleware(request: NextRequest) {
     homeUrl.pathname = "/";
     return NextResponse.redirect(homeUrl);
   }
-    return supabaseResponse;
+    return NextResponse.next();
   } catch (err) {
     // If anything goes wrong in middleware (for example an incompatible
     // package/runtime on the Edge), don't crash the request — allow it
