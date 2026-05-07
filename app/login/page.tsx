@@ -57,27 +57,34 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
+      console.log("[handleLogin] Starting login attempt...");
       const { createClient } = await import("@/lib/supabase");
       const supabase = createClient();
 
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log("[handleLogin] Calling signInWithPassword...", { email: trimmedEmail });
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: trimmedEmail,
         password,
       });
 
+      console.log("[handleLogin] Response:", { hasError: !!error, hasData: !!data });
+
       if (error) {
+        console.error("[handleLogin] Auth error:", error);
         setError(friendlyError(error.message));
         setIsLoading(false);
         return;
       }
 
+      console.log("[handleLogin] Login successful, redirecting to:", next);
       // Hard redirect instead of router.push() + router.refresh()
       // This ensures the Supabase session cookie is fully written and read
       // by the server before the next page renders — no flash of logged-out state
       window.location.href = next;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error during login";
-      console.error("Login error:", message);
+      console.error("[handleLogin] Exception caught:", { message, err });
       setError(friendlyError(message));
       setIsLoading(false);
     }
