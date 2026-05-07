@@ -32,27 +32,27 @@ export async function middleware(request: NextRequest) {
     // Treat presence of common auth cookies as a logged-in user.
     const user = hasAuthCookie ? { id: "cookie-detected" } : null;
 
-  const { pathname } = request.nextUrl;
-  const isProtected = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  );
+    const { pathname } = request.nextUrl;
+    const isProtected = PROTECTED_ROUTES.some((route) =>
+      pathname.startsWith(route)
+    );
 
-  // Not logged in + trying to access a protected route → redirect to /login
-  if (!user && isProtected) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    // Pass the intended destination so we can redirect back after login
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
+    // Not logged in + trying to access a protected route → redirect to /login
+    if (!user && isProtected) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      // Pass the intended destination so we can redirect back after login
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
 
-  // Logged in + trying to access /login or /register → redirect home
-  // Prevents a logged-in user from seeing the login page
-  if (user && (pathname === "/login" || pathname === "/register")) {
-    const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = "/";
-    return NextResponse.redirect(homeUrl);
-  }
+    // Logged in + trying to access /login or /register → redirect home
+    // Prevents a logged-in user from seeing the login page
+    if (user && (pathname === "/login" || pathname === "/register")) {
+      const homeUrl = request.nextUrl.clone();
+      homeUrl.pathname = "/";
+      return NextResponse.redirect(homeUrl);
+    }
     return NextResponse.next();
   } catch (err) {
     // If anything goes wrong in middleware (for example an incompatible
