@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -41,6 +41,20 @@ export default function RegisterPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Check environment variables immediately
+  useEffect(() => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    console.log("[Register] Env check:");
+    console.log("  NEXT_PUBLIC_SUPABASE_URL:", url ? `✓ (${url.substring(0, 30)}...)` : "✗ MISSING");
+    console.log("  NEXT_PUBLIC_SUPABASE_ANON_KEY:", key ? `✓ (${key.substring(0, 30)}...)` : "✗ MISSING");
+    
+    if (!url || !key) {
+      setError("⚠️ Supabase environment variables not found. Check Vercel project settings.");
+    }
+  }, []);
 
   async function handleRegister(e: FormEvent) {
     e.preventDefault();

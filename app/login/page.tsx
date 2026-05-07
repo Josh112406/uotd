@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, Suspense } from "react";
+import { useState, FormEvent, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -29,6 +29,20 @@ function LoginForm() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Check environment variables immediately
+  useEffect(() => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    console.log("[Login] Env check:");
+    console.log("  NEXT_PUBLIC_SUPABASE_URL:", url ? `✓ (${url.substring(0, 30)}...)` : "✗ MISSING");
+    console.log("  NEXT_PUBLIC_SUPABASE_ANON_KEY:", key ? `✓ (${key.substring(0, 30)}...)` : "✗ MISSING");
+    
+    if (!url || !key) {
+      setError("⚠️ Supabase environment variables not found. Check Vercel project settings.");
+    }
+  }, []);
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
