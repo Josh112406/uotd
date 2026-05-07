@@ -58,32 +58,39 @@ export default function RegisterPage() {
 
     setIsLoading(true);
 
-    const { createClient } = await import("@/lib/supabase");
-    const supabase = createClient();
+    try {
+      const { createClient } = await import("@/lib/supabase");
+      const supabase = createClient();
 
-    const { data, error } = await supabase.auth.signUp({
-      email: trimmedEmail,
-      password,
-      options: {
-        data: { full_name: trimmedName },
-        // Only used when email confirmation is ON — safe to keep
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+      const { data, error } = await supabase.auth.signUp({
+        email: trimmedEmail,
+        password,
+        options: {
+          data: { full_name: trimmedName },
+          // Only used when email confirmation is ON — safe to keep
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
 
-    if (error) {
-      setError(friendlyError(error.message));
+      if (error) {
+        setError(friendlyError(error.message));
+        setIsLoading(false);
+        return;
+      }
+
+      // If email confirmation is OFF (local dev), Supabase returns a session immediately.
+      // In that case, go straight home. Otherwise send to login with a message.
+      if (data.session) {
+        router.push("/");
+        router.refresh();
+      } else {
+        router.push("/login?registered=true");
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error during registration";
+      console.error("Registration error:", message);
+      setError(friendlyError(message));
       setIsLoading(false);
-      return;
-    }
-
-    // If email confirmation is OFF (local dev), Supabase returns a session immediately.
-    // In that case, go straight home. Otherwise send to login with a message.
-    if (data.session) {
-      router.push("/");
-      router.refresh();
-    } else {
-      router.push("/login?registered=true");
     }
   }
 

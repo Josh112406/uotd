@@ -10,11 +10,18 @@ export function createClient() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    // During build/prerender without env vars — return a dummy that won't crash
-    // This only happens at build time; at runtime the real values are always present
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local"
-    );
+    const missingVars = [];
+    if (!url) missingVars.push("NEXT_PUBLIC_SUPABASE_URL");
+    if (!key) missingVars.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    const error = `Missing environment variables: ${missingVars.join(", ")}. Check Vercel project settings.`;
+    console.error(error);
+    throw new Error(error);
+  }
+
+  // Validate URL format
+  if (!url.startsWith("https://")) {
+    console.error("Invalid NEXT_PUBLIC_SUPABASE_URL format:", url);
+    throw new Error("Invalid Supabase URL format");
   }
 
   return createBrowserClient(url, key);

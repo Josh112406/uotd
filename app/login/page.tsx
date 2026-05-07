@@ -42,24 +42,31 @@ function LoginForm() {
 
     setIsLoading(true);
 
-    const { createClient } = await import("@/lib/supabase");
-    const supabase = createClient();
+    try {
+      const { createClient } = await import("@/lib/supabase");
+      const supabase = createClient();
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: trimmedEmail,
-      password,
-    });
+      const { error } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password,
+      });
 
-    if (error) {
-      setError(friendlyError(error.message));
+      if (error) {
+        setError(friendlyError(error.message));
+        setIsLoading(false);
+        return;
+      }
+
+      // Hard redirect instead of router.push() + router.refresh()
+      // This ensures the Supabase session cookie is fully written and read
+      // by the server before the next page renders — no flash of logged-out state
+      window.location.href = next;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error during login";
+      console.error("Login error:", message);
+      setError(friendlyError(message));
       setIsLoading(false);
-      return;
     }
-
-    // Hard redirect instead of router.push() + router.refresh()
-    // This ensures the Supabase session cookie is fully written and read
-    // by the server before the next page renders — no flash of logged-out state
-    window.location.href = next;
   }
 
   return (
