@@ -60,6 +60,24 @@ const QUICK_ADD_SUGGESTIONS = [
   "Vinegar", "Fish sauce", "Cooking oil", "Potatoes", "Kangkong",
 ];
 
+const UNIT_OPTIONS = [
+  "pcs",
+  "cloves",
+  "tbsp",
+  "tsp",
+  "cup",
+  "g",
+  "kg",
+  "ml",
+  "l",
+  "pack",
+  "can",
+];
+
+function isValidQuantity(value: string): boolean {
+  return /^\d+(?:\.\d+)?$/.test(value.trim());
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function PantryPage() {
@@ -73,6 +91,7 @@ export default function PantryPage() {
   // Add form state
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [unit, setUnit] = useState("pcs");
   const [category, setCategory] = useState("Others");
   const [addError, setAddError] = useState("");
   const [isAdding, setIsAdding] = useState(false);
@@ -132,13 +151,31 @@ export default function PantryPage() {
       return;
     }
 
+    const quantityTrimmed = quantity.trim();
+    const quantityValue = quantityTrimmed ? Number(quantityTrimmed) : null;
+
+    if (quantityTrimmed) {
+      if (!isValidQuantity(quantityTrimmed) || quantityValue === null || !Number.isFinite(quantityValue)) {
+        setAddError("Dapat numero lang ang quantity, tulad ng 1 o 1.5.");
+        return;
+      }
+      if (quantityValue <= 0) {
+        setAddError("Ang quantity ay dapat mas mataas sa 0.");
+        return;
+      }
+    }
+
     setIsAdding(true);
+
+    const normalizedQuantity = quantityTrimmed
+      ? `${quantityValue} ${unit}`
+      : "";
 
     // Optimistic UI — add immediately with a temp id
     const tempItem: PantryItem = {
       id: `temp-${Date.now()}`,
       name: trimmedName,
-      quantity: quantity.trim(),
+      quantity: normalizedQuantity,
       category,
       created_at: new Date().toISOString(),
     };
@@ -148,7 +185,7 @@ export default function PantryPage() {
       const res = await fetch("/api/pantry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmedName, quantity: quantity.trim(), category }),
+        body: JSON.stringify({ name: trimmedName, quantity: normalizedQuantity, category }),
       });
 
       const data = await res.json();
@@ -166,6 +203,7 @@ export default function PantryPage() {
       // Reset form but keep it open for fast multi-add
       setName("");
       setQuantity("");
+      setUnit("pcs");
       setCategory("Others");
       nameInputRef.current?.focus();
     } catch {
@@ -364,7 +402,7 @@ export default function PantryPage() {
         {showForm && (
           <div className="border-t border-brand-rice px-4 py-4">
             <form onSubmit={handleAdd} noValidate className="space-y-3">
-              <div className="flex gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px] gap-2">
                 {/* Name — takes most space */}
                 <div className="flex-1">
                   <label htmlFor="ing-name" className="block text-xs font-body font-semibold text-brand-bark mb-1">
@@ -382,19 +420,36 @@ export default function PantryPage() {
                   />
                 </div>
                 {/* Quantity — smaller */}
-                <div className="w-28">
+                <div className="min-w-0">
                   <label htmlFor="ing-qty" className="block text-xs font-body font-semibold text-brand-bark mb-1">
                     Quantity
                   </label>
-                  <input
-                    id="ing-qty"
-                    type="text"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    placeholder="e.g. 3 pcs"
-                    className="w-full px-3 py-2 rounded-lg border border-brand-smoke/30 bg-white text-brand-bark font-body text-sm placeholder:text-brand-smoke/50 focus:border-brand-rust focus:outline-none transition"
-                    autoComplete="off"
-                  />
+                  <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2 items-start">
+                    <input
+                      id="ing-qty"
+                      type="text"
+                      inputMode="decimal"
+                      pattern="^\\d+(?:\\.\\d+)?$"
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
+                      placeholder="e.g. 3 or 1.5"
+                      className="w-full px-3 py-2 rounded-lg border border-brand-smoke/30 bg-white text-brand-bark font-body text-sm placeholder:text-brand-smoke/50 focus:border-brand-rust focus:outline-none transition"
+                      autoComplete="off"
+                    />
+                    <select
+                      aria-label="Unit"
+                      value={unit}
+                      onChange={(e) => setUnit(e.target.value)}
+                      className="w-full px-2 py-2 rounded-lg border border-brand-smoke/30 bg-white text-brand-bark font-body text-xs focus:border-brand-rust focus:outline-none transition"
+                    >
+                      {UNIT_OPTIONS.map((u) => (
+                        <option key={u} value={u}>{u}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <p className="mt-1 text-[11px] text-brand-smoke font-body">
+                    Number only, like 1 or 1.5.
+                  </p>
                 </div>
               </div>
 
@@ -431,7 +486,7 @@ export default function PantryPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setShowForm(false); setAddError(""); setName(""); setQuantity(""); setCategory("Others"); }}
+                  onClick={() => { setShowForm(false); setAddError(""); setName(""); setQuantity(""); setUnit("pcs"); setCategory("Others"); }}
                   className="px-4 py-2.5 border border-brand-smoke/30 text-brand-smoke font-body text-sm rounded-lg hover:bg-brand-rice transition"
                 >
                   Kanselahin

@@ -49,6 +49,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
+  if (quantity) {
+    const parts = quantity.split(/\s+/);
+    const numeric = Number(parts[0]);
+    if (!/^\d+(?:\.\d+)?$/.test(parts[0]) || !Number.isFinite(numeric)) {
+      return NextResponse.json({ error: "Quantity must be a whole number or decimal" }, { status: 400 });
+    }
+    if (numeric <= 0) {
+      return NextResponse.json({ error: "Quantity must be greater than 0" }, { status: 400 });
+    }
+  }
+
   // Prevent duplicates — case-insensitive check
   const { data: existing } = await supabase
     .from("pantry_items")

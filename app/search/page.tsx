@@ -58,7 +58,7 @@ interface PantryItem {
   name: string;
 }
 
-const RESULT_LIMIT = 8;
+const RESULT_LIMIT = 6;
 
 // ── Serving Stepper Component ─────────────────────────────────────────────────
 
