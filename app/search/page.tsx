@@ -58,6 +58,8 @@ interface PantryItem {
   name: string;
 }
 
+const RESULT_LIMIT = 8;
+
 // ── Serving Stepper Component ─────────────────────────────────────────────────
 
 interface ServingStepperProps {
@@ -196,7 +198,9 @@ function SearchInner() {
     setServingsMap({});
 
     try {
-      const res = await fetch(`/api/search?dish=${encodeURIComponent(trimmed)}`);
+      const res = await fetch(
+        `/api/search?dish=${encodeURIComponent(trimmed)}&limit=${RESULT_LIMIT}`
+      );
       const data = await res.json();
 
       if (!res.ok) {
@@ -551,7 +555,7 @@ function SearchInner() {
 function SearchSkeleton() {
   return (
     <div className="space-y-3 animate-pulse">
-      {[1, 2, 3].map((i) => (
+      {Array.from({ length: RESULT_LIMIT }).map((_, i) => (
         <div key={i} className="rounded-2xl border border-brand-rice bg-brand-garlic px-4 py-4 flex items-center gap-3">
           <div className="flex-1">
             <div className="h-5 bg-brand-rice rounded w-1/2 mb-2" />

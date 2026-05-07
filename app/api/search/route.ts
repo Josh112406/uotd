@@ -20,6 +20,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const dish = (searchParams.get("dish") ?? "").trim();
+  const limitParam = Number(searchParams.get("limit") ?? "8");
+  const limit = Number.isFinite(limitParam)
+    ? Math.min(10, Math.max(3, Math.floor(limitParam)))
+    : 8;
 
   if (!dish) {
     return NextResponse.json(
@@ -33,7 +37,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Server configuration error." }, { status: 500 });
   }
 
-  const prompt = `Give me 3 Filipino dish variants related to "${dish}".
+  const prompt = `Give me ${limit} Filipino dish variants related to "${dish}".
 
 Return ONLY a JSON array, no markdown, no backticks, no preamble, starting with [
 Each object must have exactly these fields:
@@ -61,7 +65,8 @@ CRITICAL RULES — follow exactly:
 - steps: numbered from 1, instruction in Filipino/Taglish is fine
 - timerMinutes: 0 if no waiting time, otherwise the number of minutes to wait/cook
 - Keep steps practical and clear for everyday Filipino cooking
-- Return exactly 3 variants (e.g. Pork Adobo, Chicken Adobo, Adobong Kangkong for "Adobo")`;
+- Keep steps concise (max 5 steps per dish)
+- Return exactly ${limit} variants (e.g. Pork Adobo, Chicken Adobo, Adobong Kangkong for "Adobo")`;
 
   let geminiRaw = "";
   try {
@@ -149,7 +154,7 @@ CRITICAL RULES — follow exactly:
   interface Ingredient { name: string; amount: string; }
   interface Step { step: number; instruction: string; timerMinutes: number; }
 
-  const validated = (results as RawResult[]).slice(0, 3).map((r) => ({
+  const validated = (results as RawResult[]).slice(0, limit).map((r) => ({
     name: String(r.name ?? "Unknown"),
     description: String(r.description ?? ""),
     servings: typeof r.servings === "number" ? Math.max(1, r.servings) : 4,
