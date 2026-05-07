@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FAF3E0;
+  --foreground: #3B1F0E;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FAF3E0;
+  color: #3B1F0E;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Focus ring for accessibility — uses brand rust */
+*:focus-visible {
+  outline: 2px solid #B94A1C;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
