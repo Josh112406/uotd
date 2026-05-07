@@ -9,15 +9,11 @@ export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Log sanitized values for debugging
-  console.log(
-    `[Supabase] URL present: ${!!url}`,
-    url ? `(${url.substring(0, 20)}...)` : ""
-  );
-  console.log(
-    `[Supabase] Key present: ${!!key}`,
-    key ? `(${key.substring(0, 20)}...)` : ""
-  );
+  console.log("[Supabase] Creating client with:");
+  console.log("  URL:", url);
+  console.log("  URL length:", url?.length);
+  console.log("  Key length:", key?.length);
+  console.log("  Key first 30 chars:", key?.substring(0, 30));
 
   if (!url || !key) {
     const missingVars = [];
@@ -28,27 +24,25 @@ export function createClient() {
     throw new Error(error);
   }
 
-  // Validate URL format
-  if (!url.startsWith("https://")) {
-    const error = `Invalid NEXT_PUBLIC_SUPABASE_URL format (must start with https://): ${url}`;
-    console.error("[Supabase]", error);
-    throw new Error(error);
-  }
-
-  // Validate key format (should be a valid JWT-like token)
-  if (!key.includes(".")) {
-    const error = `Invalid NEXT_PUBLIC_SUPABASE_ANON_KEY format (should contain multiple parts). Key length: ${key.length}`;
-    console.error("[Supabase]", error);
-    throw new Error(error);
-  }
-
   try {
+    console.log("[Supabase] Calling createBrowserClient...");
     const client = createBrowserClient(url, key);
-    console.log("[Supabase] Client initialized successfully");
+    
+    // Intercept fetch to log what Supabase is trying to do
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      const [resource] = args;
+      if (typeof resource === 'string' && resource.includes('supabase')) {
+        console.log("[Supabase Fetch]", resource);
+      }
+      return originalFetch.apply(this, args);
+    };
+    
+    console.log("[Supabase] Client created successfully");
     return client;
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
-    console.error("[Supabase] Failed to create client:", errorMsg);
+    console.error("[Supabase] Failed to create client:", errorMsg, err);
     throw new Error(`Failed to initialize Supabase client: ${errorMsg}`);
   }
 }
