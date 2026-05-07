@@ -8,35 +8,37 @@ import { createServerClient } from "@supabase/ssr";
 const PROTECTED_ROUTES = ["/pantry", "/suggest", "/search"];
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  // Default response; may be replaced if we need to set cookies
+  let supabaseResponse = NextResponse.next();
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            // Must set cookies on both request and response to keep session fresh
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value)
+            );
+            supabaseResponse = NextResponse.next();
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            );
+          },
         },
-        setAll(cookiesToSet) {
-          // Must set cookies on both request and response to keep session fresh
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
+      }
+    );
 
-  // IMPORTANT: Do not add logic between createServerClient and getUser().
-  // A simple mistake here can cause hard-to-debug session issues.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    // IMPORTANT: Do not add logic between createServerClient and getUser().
+    // A simple mistake here can cause hard-to-debug session issues.
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
   const isProtected = PROTECTED_ROUTES.some((route) =>
@@ -59,8 +61,14 @@ export async function middleware(request: NextRequest) {
     homeUrl.pathname = "/";
     return NextResponse.redirect(homeUrl);
   }
-
-  return supabaseResponse;
+    return supabaseResponse;
+  } catch (err) {
+    // If anything goes wrong in middleware (for example an incompatible
+    // package/runtime on the Edge), don't crash the request — allow it
+    // to continue. Log error for debugging in Vercel logs.
+    console.error("middleware supabase error:", err);
+    return NextResponse.next();
+  }
 }
 
 export const config = {
