@@ -35,12 +35,8 @@ function LoginForm() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
-    console.log("[Login] Env check:");
-    console.log("  NEXT_PUBLIC_SUPABASE_URL:", url ? `✓ (${url.substring(0, 30)}...)` : "✗ MISSING");
-    console.log("  NEXT_PUBLIC_SUPABASE_ANON_KEY:", key ? `✓ (${key.substring(0, 30)}...)` : "✗ MISSING");
-    
     if (!url || !key) {
-      setError("⚠️ Supabase environment variables not found. Check Vercel project settings.");
+      setError("Supabase environment variables not found. Check Vercel settings.");
     }
   }, []);
 
@@ -57,34 +53,23 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
-      console.log("[handleLogin] Starting login attempt...");
       const { createClient } = await import("@/lib/supabase");
       const supabase = createClient();
 
-      console.log("[handleLogin] Calling signInWithPassword...", { email: trimmedEmail });
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: trimmedEmail,
         password,
       });
 
-      console.log("[handleLogin] Response:", { hasError: !!error, hasData: !!data });
-
       if (error) {
-        console.error("[handleLogin] Auth error:", error);
         setError(friendlyError(error.message));
         setIsLoading(false);
         return;
       }
 
-      console.log("[handleLogin] Login successful, redirecting to:", next);
-      // Hard redirect instead of router.push() + router.refresh()
-      // This ensures the Supabase session cookie is fully written and read
-      // by the server before the next page renders — no flash of logged-out state
       window.location.href = next;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error during login";
-      console.error("[handleLogin] Exception caught:", { message, err });
+      const message = err instanceof Error ? err.message : "Unknown error";
       setError(friendlyError(message));
       setIsLoading(false);
     }

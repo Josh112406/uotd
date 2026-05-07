@@ -47,12 +47,8 @@ export default function RegisterPage() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
-    console.log("[Register] Env check:");
-    console.log("  NEXT_PUBLIC_SUPABASE_URL:", url ? `✓ (${url.substring(0, 30)}...)` : "✗ MISSING");
-    console.log("  NEXT_PUBLIC_SUPABASE_ANON_KEY:", key ? `✓ (${key.substring(0, 30)}...)` : "✗ MISSING");
-    
     if (!url || !key) {
-      setError("⚠️ Supabase environment variables not found. Check Vercel project settings.");
+      setError("Supabase environment variables not found. Check Vercel settings.");
     }
   }, []);
 
@@ -81,7 +77,6 @@ export default function RegisterPage() {
         password,
         options: {
           data: { full_name: trimmedName },
-          // Only used when email confirmation is ON — safe to keep
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
@@ -92,8 +87,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // If email confirmation is OFF (local dev), Supabase returns a session immediately.
-      // In that case, go straight home. Otherwise send to login with a message.
       if (data.session) {
         router.push("/");
         router.refresh();
@@ -101,8 +94,7 @@ export default function RegisterPage() {
         router.push("/login?registered=true");
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error during registration";
-      console.error("Registration error:", message);
+      const message = err instanceof Error ? err.message : "Unknown error";
       setError(friendlyError(message));
       setIsLoading(false);
     }
