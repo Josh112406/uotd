@@ -70,10 +70,23 @@ export default function PantryPage() {
   const [isFetching, setIsFetching] = useState(true);
   const [fetchError, setFetchError] = useState("");
 
+  const QUICK_ADD_SUGGESTIONS = [
+  "Egg",
+  "Rice",
+  "Chicken",
+  "Pork",
+  "Garlic",
+  "Onion",
+  "Tomato",
+  "Cooking Oil",
+  "Soy Sauce",
+  "Vinegar",
+  ];
   // Add form state
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [category, setCategory] = useState("Others");
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
+  const [unit, setUnit] = useState("");  const [category, setCategory] = useState("Others");
   const [addError, setAddError] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -85,6 +98,22 @@ export default function PantryPage() {
 
   // ── Auth guard ──────────────────────────────────────────────────────────────
   // Middleware handles the redirect, but this is a fallback for race conditions
+  useEffect(() => {
+    // If input is empty, remove suggestions
+    if (!name.trim()) {
+      setFilteredSuggestions([]);
+      return;
+    }
+
+    // Find matching ingredients
+    const matches = QUICK_ADD_SUGGESTIONS.filter((item) =>
+      item.toLowerCase().includes(name.toLowerCase())
+    );
+
+    // Limit to 5 suggestions
+    setFilteredSuggestions(matches.slice(0, 5));
+  }, [name]);
+
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/login?next=/pantry");
@@ -132,6 +161,16 @@ export default function PantryPage() {
       return;
     }
 
+    if (!quantity.trim()) {
+      setAddError("Lagyan ng quantity.");
+      return;
+    }
+
+    if (!unit.trim()) {
+      setAddError("Pumili ng unit.");
+      return;
+    }
+
     setIsAdding(true);
 
     // Optimistic UI — add immediately with a temp id
@@ -148,7 +187,12 @@ export default function PantryPage() {
       const res = await fetch("/api/pantry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmedName, quantity: quantity.trim(), category }),
+        body: JSON.stringify({
+                              name: trimmedName,
+                              quantity,
+                              unit,
+                              category,
+                            }),
       });
 
       const data = await res.json();
@@ -200,13 +244,25 @@ export default function PantryPage() {
       });
     }
   }
-
   // ── Group items by category ─────────────────────────────────────────────────
   const grouped = CATEGORIES.reduce<Record<string, PantryItem[]>>((acc, cat) => {
     const catItems = items.filter((i) => i.category === cat);
     if (catItems.length > 0) acc[cat] = catItems;
     return acc;
   }, {});
+
+  useEffect(() => {
+    if (!name.trim()) {
+      setFilteredSuggestions([]);
+      return;
+    }
+
+    const matches = QUICK_ADD_SUGGESTIONS.filter((item) =>
+      item.toLowerCase().includes(name.toLowerCase())
+    );
+
+    setFilteredSuggestions(matches.slice(0, 5));
+  }, [name]);
 
   // ── Quick add from suggestion ───────────────────────────────────────────────
   function quickAdd(suggestion: string) {
@@ -395,6 +451,38 @@ export default function PantryPage() {
                     className="w-full px-3 py-2 rounded-lg border border-brand-smoke/30 bg-white text-brand-bark font-body text-sm placeholder:text-brand-smoke/50 focus:border-brand-rust focus:outline-none transition"
                     autoComplete="off"
                   />
+                  {filteredSuggestions.length > 0 && (
+                    <div className="mt-2 rounded-xl border bg-white shadow-sm overflow-hidden">
+                      {filteredSuggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          onClick={() => {
+                            setName(suggestion);
+                            setFilteredSuggestions([]);
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-brand-cream"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <select
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    className="w-full rounded-xl border px-4 py-3"
+                  >
+                    <option value="">Select unit</option>
+                    <option value="pcs">pcs</option>
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="L">L</option>
+                    <option value="ml">ml</option>
+                    <option value="cups">cups</option>
+                    <option value="tbsp">tbsp</option>
+                    <option value="tsp">tsp</option>
+                  </select>
                 </div>
               </div>
 
