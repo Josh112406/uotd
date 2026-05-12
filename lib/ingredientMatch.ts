@@ -17,30 +17,53 @@
  * Covers both directions: Filipino→English and English→Filipino.
  */
 
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // ── Filipino ↔ English dictionary ─────────────────────────────────────────────
 // Each entry maps one language to the other.
 // Keys are lowercase. Values are arrays to handle multiple forms.
 
 const FIL_TO_ENG: Record<string, string[]> = {
-  // Proteins
+  // Proteins (Meats)
   "baboy": ["pork"],
   "liempo": ["pork belly", "pork"],
   "manok": ["chicken"],
-  "isda": ["fish"],
-  "hipon": ["shrimp", "prawns"],
   "karne": ["meat", "beef"],
   "baka": ["beef"],
   "itlog": ["egg", "eggs"],
+  "giniling": ["ground pork", "ground beef", "ground meat", "minced meat"],
+  "atay": ["liver", "pork liver", "chicken liver", "beef liver"],
+  "hotdog": ["hotdog", "sausage", "hotdogs"],
+  "tocino": ["tocino", "sweet cured pork"],
+  "longganisa": ["longganisa", "filipino sausage"],
+  "tapa": ["tapa", "cured beef", "beef tapa"],
+  
+  // Seafood
+  "isda": ["fish"],
+  "hipon": ["shrimp", "prawns"],
+  "bangus": ["milkfish", "bangus"],
+  "tilapia": ["tilapia"],
+  "galunggong": ["scad", "round scad", "galunggong"],
+  "pusit": ["squid"],
+  "tahong": ["mussels"],
+  "talaba": ["oysters"],
+  "alimango": ["crab", "mud crab"],
+  "alimasag": ["crab", "blue crab"],
+  "tuyo": ["dried fish", "salted fish"],
+  "daing": ["dried fish"],
+  "tinapa": ["smoked fish"],
 
   // Vegetables
-  "sibuyas": ["onion", "onions"],
+  "sibuyas": ["onion", "onions", "red onion", "white onion"],
   "kamatis": ["tomato", "tomatoes"],
   "luya": ["ginger"],
   "dahon ng laurel": ["bay leaf", "bay leaves"],
   "kangkong": ["water spinach", "kangkong"],
-  "pechay": ["bok choy", "chinese cabbage"],
-  "sitaw": ["string beans", "green beans"],
-  "talong": ["eggplant"],
+  "pechay": ["bok choy", "chinese cabbage", "pechay"],
+  "sitaw": ["string beans", "green beans", "yardlong beans"],
+  "talong": ["eggplant", "aubergine"],
   "ampalaya": ["bitter melon", "bitter gourd"],
   "patola": ["luffa", "sponge gourd"],
   "sayote": ["chayote"],
@@ -48,35 +71,79 @@ const FIL_TO_ENG: Record<string, string[]> = {
   "kamote": ["sweet potato"],
   "kalabasa": ["squash", "pumpkin"],
   "gulay": ["vegetables", "veggies"],
+  "repolyo": ["cabbage"],
+  "karot": ["carrot", "carrots"],
+  "patatas": ["potato", "potatoes"],
+  "siling labuyo": ["bird's eye chili", "chili", "chili pepper", "red chili"],
+  "siling haba": ["green chili", "finger chili", "long green pepper"],
+  "bataw": ["hyacinth bean"],
+  "sigarilyas": ["winged bean"],
+  "malunggay": ["moringa", "moringa leaves"],
+  "monggo": ["mung beans", "munggo", "green gram"],
+  "labong": ["bamboo shoots"],
+  "puso ng saging": ["banana blossom", "banana heart"],
 
   // Spices & Condiments
   "bawang": ["garlic"],
   "asin": ["salt"],
-  "paminta": ["pepper", "black pepper", "ground pepper"],
-  "asukal": ["sugar"],
+  "paminta": ["pepper", "black pepper", "ground pepper", "peppercorns"],
+  "asukal": ["sugar", "brown sugar", "white sugar"],
   "toyo": ["soy sauce"],
-  "suka": ["vinegar"],
+  "suka": ["vinegar", "white vinegar", "cane vinegar", "coconut vinegar"],
   "patis": ["fish sauce"],
-  "bagoong": ["shrimp paste", "fermented shrimp"],
-  "mantika": ["cooking oil", "oil", "vegetable oil"],
+  "bagoong": ["shrimp paste", "fermented shrimp", "bagoong alamang", "bagoong isda"],
+  "mantika": ["cooking oil", "oil", "vegetable oil", "canola oil"],
   "achuete": ["annatto", "atsuete"],
   "atsuete": ["annatto", "achuete"],
   "dahon ng pandan": ["pandan leaves", "pandan"],
+  "ketchup": ["ketchup", "catsup", "tomato ketchup", "banana ketchup"],
+  "mayonnaise": ["mayonnaise", "mayo"],
+  "oyster sauce": ["oyster sauce"],
+  "magic sarap": ["magic sarap", "seasoning granules", "msg", "flavor enhancer"],
+  "ginisa mix": ["ginisa mix", "seasoning mix"],
+  "sinigang mix": ["sinigang mix", "tamarind soup base", "tamarind powder"],
+  "tomato paste": ["tomato paste"],
+  "tomato sauce": ["tomato sauce"],
+  "lechon sauce": ["lechon sauce", "sarsa", "mang tomas"],
 
-  // Grains & Staples
+  // Grains, Noodles & Staples
   "kanin": ["rice", "cooked rice", "day-old rice"],
   "bigas": ["rice", "uncooked rice"],
   "harina": ["flour", "all-purpose flour"],
   "cornstarch": ["cornstarch", "corn starch"],
+  "pancit bihon": ["bihon", "rice noodles", "rice sticks"],
+  "pancit canton": ["canton noodles", "egg noodles"],
+  "sotanghon": ["sotanghon", "glass noodles", "cellophane noodles"],
+  "misua": ["misua", "wheat noodles", "fine noodles"],
+  "miki": ["miki noodles", "fresh egg noodles"],
+  "lumpia wrapper": ["lumpia wrapper", "spring roll wrapper", "crepe wrapper"],
+  "tinapay": ["bread", "tasty bread", "sliced bread", "pandesal"],
+
+  // Canned Goods
+  "corned beef": ["corned beef"],
+  "sardinas": ["sardines", "canned sardines"],
+  "tuna": ["canned tuna", "tuna flakes"],
+  "spam": ["spam", "luncheon meat", "meat loaf"],
+  "vienna sausage": ["vienna sausage"],
+  "pork and beans": ["pork and beans", "baked beans"],
 
   // Liquids
   "tubig": ["water"],
-  "gata": ["coconut milk"],
-  "calamansi": ["calamansi", "lime", "lemon"],
+  "gata": ["coconut milk", "coconut cream"],
+  "calamansi": ["calamansi", "lime", "lemon", "calamansi juice"],
+  "sabaw": ["broth", "stock", "soup", "water"],
 
   // Dairy & Eggs
-  "gatas": ["milk"],
+  "gatas": ["milk", "evaporated milk", "condensed milk"],
   "mantikilya": ["butter"],
+  "keso": ["cheese", "cheddar cheese", "processed cheese", "eden cheese"],
+  "itlog na maalat": ["salted egg", "salted duck egg"],
+
+  // Fruits (often used in cooking)
+  "saging": ["banana", "saba banana", "plantain"],
+  "langka": ["jackfruit", "young jackfruit"],
+  "pinya": ["pineapple", "pineapple chunks"],
+  "mangga": ["mango", "green mango"],
 };
 
 // Build reverse map: English → Filipino
@@ -94,9 +161,13 @@ function getEquivalents(term: string): string[] {
   const lower = term.toLowerCase().trim();
   const equivalents = new Set<string>([lower]);
 
+  // Use word boundaries to avoid false positives (e.g. "a" matching everything)
+  const regex = new RegExp(`\\b${escapeRegExp(lower)}\\b`);
+
   // Check Filipino → English
   for (const [fil, engList] of Object.entries(FIL_TO_ENG)) {
-    if (lower.includes(fil) || fil.includes(lower)) {
+    const filRegex = new RegExp(`\\b${escapeRegExp(fil)}\\b`);
+    if (filRegex.test(lower) || regex.test(fil)) {
       engList.forEach((e) => equivalents.add(e));
       equivalents.add(fil);
     }
@@ -104,7 +175,8 @@ function getEquivalents(term: string): string[] {
 
   // Check English → Filipino
   for (const [eng, filList] of Object.entries(ENG_TO_FIL)) {
-    if (lower.includes(eng) || eng.includes(lower)) {
+    const engRegex = new RegExp(`\\b${escapeRegExp(eng)}\\b`);
+    if (engRegex.test(lower) || regex.test(eng)) {
       filList.forEach((f) => equivalents.add(f));
       equivalents.add(eng);
     }
@@ -117,7 +189,7 @@ function getEquivalents(term: string): string[] {
 
 /**
  * Returns true if pantryItem and ingredientName refer to the same ingredient.
- * Handles: exact match, fuzzy substring, and Filipino↔English translation.
+ * Handles: exact match, fuzzy substring with word boundaries, and Filipino↔English translation.
  */
 export function ingredientMatches(pantryItem: string, ingredientName: string): boolean {
   const pantryLower = pantryItem.toLowerCase().trim();
@@ -126,8 +198,12 @@ export function ingredientMatches(pantryItem: string, ingredientName: string): b
   // Layer 1: Exact match
   if (pantryLower === ingLower) return true;
 
+  // Helper for word-boundary matching
+  const hasWord = (str: string, word: string) => new RegExp(`\\b${escapeRegExp(word)}\\b`).test(str);
+
   // Layer 2: Bidirectional substring (handles "Cane Vinegar" vs "Vinegar")
-  if (pantryLower.includes(ingLower) || ingLower.includes(pantryLower)) return true;
+  // Use word boundaries to prevent "egg" matching "eggplant"
+  if (hasWord(pantryLower, ingLower) || hasWord(ingLower, pantryLower)) return true;
 
   // Layer 3: Dictionary — get all equivalents for both sides, then cross-check
   const pantryEquivs = getEquivalents(pantryLower);
@@ -136,7 +212,7 @@ export function ingredientMatches(pantryItem: string, ingredientName: string): b
   for (const pe of pantryEquivs) {
     for (const ie of ingEquivs) {
       if (pe === ie) return true;
-      if (pe.includes(ie) || ie.includes(pe)) return true;
+      if (hasWord(pe, ie) || hasWord(ie, pe)) return true;
     }
   }
 

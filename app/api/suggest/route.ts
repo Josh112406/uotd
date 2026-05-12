@@ -108,8 +108,10 @@ Each object must have exactly these fields:
 CRITICAL RULES — follow exactly:
 - Real Filipino dishes only (dish name can be Filipino e.g. "Pork Adobo", "Sinigang na Baboy")
 - missingIngredients: write ingredient names in ENGLISH only (e.g. "Garlic", "Soy sauce", "Vinegar") — never in Filipino
-- matchType="full" ONLY if the pantry has ALL the key ingredients needed. Be strict — if garlic, onion, or any essential item is missing, it is "partial"
-- matchType="partial" if ANY essential ingredient is missing from the pantry list above
+- matchType="full" ONLY if the pantry has ALL the key ingredients needed. 
+- BE CREATIVE WITH SUBSTITUTES: If a common substitute is in the pantry (e.g. Calamansi instead of Vinegar, Pork instead of Chicken), consider it a "full" match.
+- FLEXIBLE RECIPES: For dishes like Sinigang, Pancit, or Fried Rice, any combination of available vegetables or meats is acceptable. Don't mark them missing if standard ones aren't there, as long as the base is present.
+- matchType="partial" if a TRULY ESSENTIAL ingredient is missing (like no meat for Adobong Baboy).
 - missingIngredients: only truly essential missing items (not optional garnishes), keep list short, in English
 - estimatedCostPHP: cost in PHP of missing ingredients only (0 if full match)
 - reason: max 8 words in Filipino explaining fit
@@ -126,7 +128,7 @@ CRITICAL RULES — follow exactly:
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.7,
+            temperature: 0.8,
             maxOutputTokens: 4096,
           },
         }),

@@ -35,9 +35,12 @@ interface PantryItem {
 
 const CATEGORIES = [
   "Proteins",
+  "Seafood",
   "Vegetables",
   "Spices & Condiments",
   "Grains & Staples",
+  "Noodles",
+  "Canned Goods",
   "Dairy & Eggs",
   "Fruits",
   "Others",
@@ -45,9 +48,12 @@ const CATEGORIES = [
 
 const CATEGORY_EMOJI: Record<string, string> = {
   "Proteins": "🥩",
+  "Seafood": "🐟",
   "Vegetables": "🥦",
   "Spices & Condiments": "🧄",
   "Grains & Staples": "🍚",
+  "Noodles": "🍜",
+  "Canned Goods": "🥫",
   "Dairy & Eggs": "🥚",
   "Fruits": "🍌",
   "Others": "🧺",
@@ -55,9 +61,12 @@ const CATEGORY_EMOJI: Record<string, string> = {
 
 // Common Filipino pantry ingredients for quick-add suggestions
 const QUICK_ADD_SUGGESTIONS = [
-  "Garlic", "Onion", "Tomato", "Ginger", "Pork belly",
+  "Garlic", "Onion", "Tomato", "Ginger", "Pork",
   "Chicken", "Fish", "Eggs", "Rice", "Soy sauce",
   "Vinegar", "Fish sauce", "Cooking oil", "Potatoes", "Kangkong",
+  "Pepper", "Salt", "Sugar", "Magic Sarap", "Shrimp Paste",
+  "Pancit Canton", "Sardines", "Corned Beef", "Calamansi", "Coconut Milk",
+  "Pechay", "Eggplant", "Cabbage", "Carrots", "Pork Belly"
 ];
 
 const UNIT_OPTIONS = [

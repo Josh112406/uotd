@@ -66,6 +66,7 @@ CRITICAL RULES — follow exactly:
 - timerMinutes: 0 if no waiting time, otherwise the number of minutes to wait/cook
 - Keep steps practical and clear for everyday Filipino cooking
 - Keep steps concise (max 5 steps per dish)
+- PROVIDE DIVERSE VARIANTS: Make the variants distinct. For example, include a traditional version, a budget-friendly/pantry-staple version, and a modern/regional twist.
 - Return exactly ${limit} variants (e.g. Pork Adobo, Chicken Adobo, Adobong Kangkong for "Adobo")`;
 
   let geminiRaw = "";
@@ -78,7 +79,7 @@ CRITICAL RULES — follow exactly:
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.5,
+            temperature: 0.7,
             maxOutputTokens: 8192,
           },
         }),
