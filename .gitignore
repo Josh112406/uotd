@@ -34,3 +34,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI Agent Docs
+TechDesign-UOTD-MVP.md
+AGENTS.md
+MEMORY.md
+REVIEW-CHECKLIST.md
+GEMINI.md
+agent_docs/
