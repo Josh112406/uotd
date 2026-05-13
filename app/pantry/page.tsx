@@ -109,6 +109,13 @@ export default function PantryPage() {
   // Deletion in-progress tracking (per item id)
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
+  // Randomize quick add suggestions on mount
+  const [shuffledSuggestions, setShuffledSuggestions] = useState<string[]>([]);
+  useEffect(() => {
+    const shuffled = [...QUICK_ADD_SUGGESTIONS].sort(() => 0.5 - Math.random());
+    setShuffledSuggestions(shuffled);
+  }, []);
+
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   // ── Auth guard ──────────────────────────────────────────────────────────────
@@ -319,7 +326,7 @@ export default function PantryPage() {
           </p>
           {/* Quick add suggestions */}
           <div className="flex flex-wrap justify-center gap-2 px-4">
-            {QUICK_ADD_SUGGESTIONS.slice(0, 8).map((s) => (
+            {shuffledSuggestions.slice(0, 12).map((s) => (
               <button
                 key={s}
                 onClick={() => quickAdd(s)}
@@ -508,9 +515,9 @@ export default function PantryPage() {
               <div className="mt-3 pt-3 border-t border-brand-rice">
                 <p className="text-xs font-body text-brand-smoke/60 mb-2">Mabilis na dagdag:</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {QUICK_ADD_SUGGESTIONS.filter(
+                  {shuffledSuggestions.filter(
                     (s) => !items.some((i) => i.name.toLowerCase() === s.toLowerCase())
-                  ).slice(0, 10).map((s) => (
+                  ).slice(0, 15).map((s) => (
                     <button
                       key={s}
                       type="button"
