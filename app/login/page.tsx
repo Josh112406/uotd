@@ -6,13 +6,13 @@ import { useSearchParams } from "next/navigation";
 
 function friendlyError(message: string): string {
   if (message.includes("Invalid login credentials"))
-    return "Mali ang email o password. Subukan ulit.";
+    return "Invalid email or password. Please try again.";
   if (message.includes("Email not confirmed"))
-    return "Hindi pa na-confirm ang iyong email. Tingnan ang iyong inbox.";
+    return "Your email is not confirmed. Please check your inbox.";
   if (message.includes("Too many requests"))
-    return "Sobrang daming pagsubok. Maghintay muna ng ilang minuto.";
+    return "Too many attempts. Please wait a few minutes.";
   if (message.includes("Invalid path"))
-    return "May problema sa configuration. I-check ang Supabase Redirect URLs.";
+    return "Configuration problem. Check Supabase Redirect URLs.";
   return message;
 }
 
@@ -46,7 +46,7 @@ function LoginForm() {
 
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !password) {
-      setError("Pakiusap, punan ang lahat ng fields.");
+      setError("Please fill in all fields.");
       return;
     }
 
@@ -82,17 +82,17 @@ function LoginForm() {
           UOTD
         </Link>
         <h1 className="font-display text-2xl font-bold text-brand-bark mt-4">
-          Mag-login
+          Login
         </h1>
         <p className="font-body text-sm text-brand-smoke mt-1">
-          Huwag nang mag-isip pa sa ulam — tara na.
+          Don&apos;t stress about meals — let&apos;s go.
         </p>
       </div>
 
       {justRegistered && (
         <div className="mb-5 px-4 py-3 bg-brand-leaf/10 border border-brand-leaf/30 rounded-lg">
           <p className="text-sm font-body text-brand-leaf font-medium">
-            ✅ Registered ka na! Mag-login na.
+            ✅ Registered! Please login.
           </p>
         </div>
       )}
@@ -111,7 +111,7 @@ function LoginForm() {
             <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
           </svg>
-          Mag-login sa Google
+          Login with Google
           <span className="ml-auto text-xs bg-brand-smoke/20 text-brand-smoke px-2 py-0.5 rounded-full">
             Soon
           </span>
@@ -119,7 +119,7 @@ function LoginForm() {
 
         <div className="flex items-center gap-3 mb-5">
           <div className="flex-1 h-px bg-brand-rice" />
-          <span className="text-xs font-body text-brand-smoke/60">o kaya</span>
+          <span className="text-xs font-body text-brand-smoke/60">or</span>
           <div className="flex-1 h-px bg-brand-rice" />
         </div>
 
@@ -162,7 +162,7 @@ function LoginForm() {
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-smoke hover:text-brand-bark transition"
-                aria-label={showPassword ? "Itago ang password" : "Ipakita ang password"}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -191,15 +191,15 @@ function LoginForm() {
             disabled={isLoading}
             className="w-full py-3 bg-brand-rust hover:bg-brand-silog disabled:opacity-60 disabled:cursor-not-allowed active:scale-95 text-white font-body font-semibold text-sm rounded-lg transition-all duration-150 mt-1"
           >
-            {isLoading ? "Naglo-load…" : "Pumasok →"}
+            {isLoading ? "Loading..." : "Enter →"}
           </button>
         </form>
       </div>
 
       <p className="text-center text-sm font-body text-brand-smoke mt-6">
-        Wala ka pang account?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/register" className="text-brand-rust font-semibold hover:underline">
-          Mag-sign up
+          Sign up
         </Link>
       </p>
     </div>
@@ -211,7 +211,7 @@ export default function LoginPage() {
     <div className="flex-1 flex items-center justify-center px-4 py-16">
       <Suspense fallback={
         <div className="text-brand-smoke font-body text-sm animate-pulse">
-          Naglo-load…
+          Loading...
         </div>
       }>
         <LoginForm />

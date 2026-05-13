@@ -21,6 +21,24 @@ function escapeRegExp(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+const ADJECTIVES = [
+  "sliced", "chopped", "minced", "diced", "peeled", "crushed", "grated",
+  "fresh", "dried", "powdered", "ground", "cooked", "uncooked", "raw",
+  "whole", "halved", "quartered", "toasted", "roasted", "fried",
+  "sweet", "spicy", "hot", "mild", "small", "medium", "large",
+  "red", "green", "white", "black", "yellow", "brown",
+  "leaves", "pieces", "cloves", "cubes", "strips", "chunks", "mashed"
+];
+
+function stripAdjectives(term: string): string {
+  let cleaned = term;
+  for (const adj of ADJECTIVES) {
+    const regex = new RegExp(`\\b${escapeRegExp(adj)}\\b`, "gi");
+    cleaned = cleaned.replace(regex, "");
+  }
+  return cleaned.replace(/,/g, "").replace(/\s+/g, " ").trim();
+}
+
 // ── Filipino ↔ English dictionary ─────────────────────────────────────────────
 // Each entry maps one language to the other.
 // Keys are lowercase. Values are arrays to handle multiple forms.
@@ -220,8 +238,8 @@ function getEquivalents(term: string): string[] {
  * Handles: exact match, fuzzy substring with word boundaries, and Filipino↔English translation.
  */
 export function ingredientMatches(pantryItem: string, ingredientName: string): boolean {
-  const pantryLower = pantryItem.toLowerCase().trim();
-  const ingLower = ingredientName.toLowerCase().trim();
+  const pantryLower = stripAdjectives(pantryItem).toLowerCase();
+  const ingLower = stripAdjectives(ingredientName).toLowerCase();
 
   // Layer 1: Exact match
   if (pantryLower === ingLower) return true;

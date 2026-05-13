@@ -83,8 +83,14 @@ const UNIT_OPTIONS = [
   "can",
 ];
 
-function isValidQuantity(value: string): boolean {
-  return /^\d+(?:\.\d+)?$/.test(value.trim());
+const WHOLE_NUMBER_UNITS = ["pcs", "cloves", "pack", "can"];
+
+function isValidQuantity(value: string, unit: string): boolean {
+  const trimmed = value.trim();
+  if (WHOLE_NUMBER_UNITS.includes(unit)) {
+    return /^\d+$/.test(trimmed);
+  }
+  return /^\d+(?:\.\d+)?$/.test(trimmed);
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
@@ -135,11 +141,11 @@ export default function PantryPage() {
       setFetchError("");
       try {
         const res = await fetch("/api/pantry");
-        if (!res.ok) throw new Error("Hindi ma-load ang pantry. Subukan ulit.");
+        if (!res.ok) throw new Error("Could not load pantry. Please try again.");
         const data = await res.json();
         setItems(data);
       } catch (err) {
-        setFetchError(err instanceof Error ? err.message : "Hindi ma-load ang pantry.");
+        setFetchError(err instanceof Error ? err.message : "Could not load pantry.");
       } finally {
         setIsFetching(false);
       }
@@ -162,7 +168,7 @@ export default function PantryPage() {
 
     const trimmedName = name.trim();
     if (!trimmedName) {
-      setAddError("Ilagay ang pangalan ng ingredient.");
+      setAddError("Enter ingredient name.");
       nameInputRef.current?.focus();
       return;
     }
@@ -171,12 +177,16 @@ export default function PantryPage() {
     const quantityValue = quantityTrimmed ? Number(quantityTrimmed) : null;
 
     if (quantityTrimmed) {
-      if (!isValidQuantity(quantityTrimmed) || quantityValue === null || !Number.isFinite(quantityValue)) {
-        setAddError("Dapat numero lang ang quantity, tulad ng 1 o 1.5.");
+      if (!isValidQuantity(quantityTrimmed, unit) || quantityValue === null || !Number.isFinite(quantityValue)) {
+        setAddError(
+          WHOLE_NUMBER_UNITS.includes(unit)
+            ? `Quantity for ${unit} must be a whole number (e.g. 1, 2, 3).`
+            : "Quantity must be a number, like 1 or 1.5."
+        );
         return;
       }
       if (quantityValue <= 0) {
-        setAddError("Ang quantity ay dapat mas mataas sa 0.");
+        setAddError("Quantity must be greater than 0.");
         return;
       }
     }
@@ -209,7 +219,7 @@ export default function PantryPage() {
       if (!res.ok) {
         // Roll back optimistic update
         setItems((prev) => prev.filter((i) => i.id !== tempItem.id));
-        setAddError(data.error ?? "Hindi naidagdag. Subukan ulit.");
+        setAddError(data.error ?? "Could not add item. Please try again.");
         return;
       }
 
@@ -224,7 +234,7 @@ export default function PantryPage() {
       nameInputRef.current?.focus();
     } catch {
       setItems((prev) => prev.filter((i) => i.id !== tempItem.id));
-      setAddError("Hindi naidagdag. I-check ang iyong koneksyon.");
+      setAddError("Could not add item. Check your connection.");
     } finally {
       setIsAdding(false);
     }
@@ -281,15 +291,15 @@ export default function PantryPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-xs font-body font-semibold tracking-widest text-brand-rust uppercase mb-1">
-            Iyong Pantry
+            Your Pantry
           </p>
           <h1 className="font-display text-3xl font-bold text-brand-bark">
-            Ano ang nasa bahay mo?
+            What&apos;s in your home?
           </h1>
           <p className="text-sm font-body text-brand-smoke mt-1">
             {items.length === 0
-              ? "Walang laman pa. Mag-dagdag ng ingredients."
-              : `${items.length} ingredient${items.length !== 1 ? "s" : ""} ang naka-save.`}
+              ? "Empty. Add some ingredients."
+              : `${items.length} ingredient${items.length !== 1 ? "s" : ""} saved.`}
           </p>
         </div>
 
@@ -299,7 +309,7 @@ export default function PantryPage() {
             href="/suggest"
             className="shrink-0 px-4 py-2.5 bg-brand-rust hover:bg-brand-silog text-white font-body font-semibold text-sm rounded-full transition-all active:scale-95 shadow-sm"
           >
-            Mag-Suggest →
+            Get Suggestions →
           </Link>
         )}
       </div>
@@ -319,10 +329,10 @@ export default function PantryPage() {
         <div className="text-center py-16 bg-brand-garlic border border-brand-rice rounded-2xl mb-6">
           <span className="text-5xl mb-4 block" aria-hidden="true">🧺</span>
           <p className="font-display text-xl font-bold text-brand-bark mb-2">
-            Walang laman pa ang pantry mo
+            Your pantry is empty
           </p>
           <p className="text-sm font-body text-brand-smoke mb-6 max-w-xs mx-auto">
-            I-dagdag ang mga ingredients na mayroon ka ngayon para makapag-suggest ng ulam.
+            Add the ingredients you currently have so we can suggest a dish.
           </p>
           {/* Quick add suggestions */}
           <div className="flex flex-wrap justify-center gap-2 px-4">
@@ -378,7 +388,7 @@ export default function PantryPage() {
                       onClick={() => handleDelete(item.id)}
                       disabled={deletingIds.has(item.id)}
                       className="ml-3 p-1.5 text-brand-smoke/50 hover:text-brand-rust hover:bg-brand-rust/10 rounded-lg transition disabled:cursor-not-allowed"
-                      aria-label={`Tanggalin ang ${item.name}`}
+                      aria-label={`Remove ${item.name}`}
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="3 6 5 6 21 6"/>
@@ -404,7 +414,7 @@ export default function PantryPage() {
         >
           <span className="flex items-center gap-2">
             <span className="text-brand-rust text-lg leading-none">+</span>
-            Mag-dagdag ng ingredient
+            Add an ingredient
           </span>
           <svg
             width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -444,11 +454,11 @@ export default function PantryPage() {
                     <input
                       id="ing-qty"
                       type="text"
-                      inputMode="decimal"
-                      pattern="^\\d+(?:\\.\\d+)?$"
+                      inputMode={WHOLE_NUMBER_UNITS.includes(unit) ? "numeric" : "decimal"}
+                      pattern={WHOLE_NUMBER_UNITS.includes(unit) ? "^\\d+$" : "^\\d+(?:\\.\\d+)?$"}
                       value={quantity}
                       onChange={(e) => setQuantity(e.target.value)}
-                      placeholder="e.g. 3 or 1.5"
+                      placeholder={WHOLE_NUMBER_UNITS.includes(unit) ? "e.g. 3" : "e.g. 3 or 1.5"}
                       className="w-full px-3 py-2 rounded-lg border border-brand-smoke/30 bg-white text-brand-bark font-body text-sm placeholder:text-brand-smoke/50 focus:border-brand-rust focus:outline-none transition"
                       autoComplete="off"
                     />
@@ -464,7 +474,9 @@ export default function PantryPage() {
                     </select>
                   </div>
                   <p className="mt-1 text-[11px] text-brand-smoke font-body">
-                    Number only, like 1 or 1.5.
+                    {WHOLE_NUMBER_UNITS.includes(unit)
+                      ? "Whole number only, like 1 or 3."
+                      : "Number only, like 1 or 1.5."}
                   </p>
                 </div>
               </div>
@@ -498,14 +510,14 @@ export default function PantryPage() {
                   disabled={isAdding}
                   className="flex-1 py-2.5 bg-brand-rust hover:bg-brand-silog disabled:opacity-60 disabled:cursor-not-allowed text-white font-body font-semibold text-sm rounded-lg transition-all active:scale-95"
                 >
-                  {isAdding ? "Nagse-save…" : "I-dagdag"}
+                  {isAdding ? "Saving…" : "Add"}
                 </button>
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setAddError(""); setName(""); setQuantity(""); setUnit("pcs"); setCategory("Others"); }}
                   className="px-4 py-2.5 border border-brand-smoke/30 text-brand-smoke font-body text-sm rounded-lg hover:bg-brand-rice transition"
                 >
-                  Kanselahin
+                  Cancel
                 </button>
               </div>
             </form>
@@ -513,7 +525,7 @@ export default function PantryPage() {
             {/* Quick add chips inside form */}
             {!name && (
               <div className="mt-3 pt-3 border-t border-brand-rice">
-                <p className="text-xs font-body text-brand-smoke/60 mb-2">Mabilis na dagdag:</p>
+                <p className="text-xs font-body text-brand-smoke/60 mb-2">Quick add:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {shuffledSuggestions.filter(
                     (s) => !items.some((i) => i.name.toLowerCase() === s.toLowerCase())
@@ -539,17 +551,17 @@ export default function PantryPage() {
         <div className="mt-6 p-4 bg-brand-rust/10 border border-brand-rust/20 rounded-2xl flex items-center justify-between gap-4">
           <div>
             <p className="font-body font-semibold text-brand-bark text-sm">
-              Handa ka na!
+              You&apos;re all set!
             </p>
             <p className="font-body text-xs text-brand-smoke mt-0.5">
-              May {items.length} ingredients ka — tingnan ang pwedeng ulam.
+              You have {items.length} ingredients — let&apos;s see what you can cook.
             </p>
           </div>
           <Link
             href="/suggest"
             className="shrink-0 px-4 py-2 bg-brand-rust hover:bg-brand-silog text-white font-body font-semibold text-sm rounded-full transition-all active:scale-95"
           >
-            Mag-Suggest →
+            Get Suggestions →
           </Link>
         </div>
       )}

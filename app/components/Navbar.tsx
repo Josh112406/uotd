@@ -60,7 +60,7 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <ul className="hidden md:flex items-center gap-1" role="list">
-          {NAV_LINKS.map(({ label, href }) => (
+          {!isLoading && user && NAV_LINKS.map(({ label, href }) => (
             <li key={href}>
               <Link
                 href={href}
@@ -133,7 +133,7 @@ export default function Navbar() {
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? "max-h-96 border-t border-brand-rice" : "max-h-0"}`}
       >
         <ul className="px-4 py-3 space-y-1" role="list">
-          {NAV_LINKS.map(({ label, href }) => (
+          {!isLoading && user && NAV_LINKS.map(({ label, href }) => (
             <li key={href}>
               <Link
                 href={href}

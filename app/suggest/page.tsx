@@ -147,14 +147,14 @@ export default function SuggestPage() {
         if (res.status === 400 && data.error?.includes("pantry")) {
           setIsEmptyPantry(true);
         } else {
-          setError(data.error ?? "May error. Subukan ulit.");
+          setError(data.error ?? "There was an error. Please try again.");
         }
         return;
       }
 
       setSuggestions(data.suggestions);
     } catch {
-      setError("Hindi maabot ang server. I-check ang iyong koneksyon.");
+      setError("Could not reach server. Check your connection.");
     } finally {
       setIsLoading(false);
     }
@@ -174,17 +174,17 @@ export default function SuggestPage() {
           AI Suggestions
         </p>
         <h1 className="font-display text-3xl font-bold text-brand-bark">
-          Anong ulam ngayon?
+          What&apos;s for mealtime?
         </h1>
         <p className="text-sm font-body text-brand-smoke mt-1">
-          Piliin ang meal type at hahanapin namin ang pwedeng lutuin mula sa iyong pantry.
+          Pick a meal type and we&apos;ll find what you can cook from your pantry.
         </p>
       </div>
 
       {/* ── Meal type selector ── */}
       <div className="mb-5">
         <p className="text-xs font-body font-semibold text-brand-bark mb-2 tracking-wide uppercase">
-          Para saan ito?
+          What&apos;s this for?
         </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {MEAL_TYPES.map((meal) => (
@@ -213,16 +213,16 @@ export default function SuggestPage() {
       <button
         onClick={handleSuggest}
         disabled={!selectedMeal || isLoading}
-        title={!selectedMeal ? "Pumili muna ng meal type" : undefined}
+        title={!selectedMeal ? "Pick a meal type first" : undefined}
         className="w-full py-3.5 bg-brand-rust hover:bg-brand-silog disabled:opacity-50 disabled:cursor-not-allowed text-white font-body font-semibold text-base rounded-xl transition-all active:scale-[0.98] shadow-sm mb-6"
       >
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">
             <LoadingSpinner />
-            Hinahanap ang ulam…
+            Finding meals…
           </span>
         ) : (
-          "Suggest Ulam ✨"
+          "Suggest Meals ✨"
         )}
       </button>
 
@@ -231,16 +231,16 @@ export default function SuggestPage() {
         <div className="text-center py-12 bg-brand-garlic border border-brand-rice rounded-2xl">
           <span className="text-5xl mb-4 block" aria-hidden="true">🧺</span>
           <p className="font-display text-xl font-bold text-brand-bark mb-2">
-            Walang laman ang pantry mo
+            Your pantry is empty
           </p>
           <p className="text-sm font-body text-brand-smoke mb-5 max-w-xs mx-auto">
-            Mag-dagdag muna ng mga ingredients para makapag-suggest ng ulam.
+            Add some ingredients first so we can suggest a dish.
           </p>
           <Link
             href="/pantry"
             className="inline-block px-6 py-2.5 bg-brand-rust hover:bg-brand-silog text-white font-body font-semibold text-sm rounded-full transition-all active:scale-95"
           >
-            Pumunta sa Pantry →
+            Go to Pantry →
           </Link>
         </div>
       )}
@@ -253,7 +253,7 @@ export default function SuggestPage() {
             onClick={handleSuggest}
             className="mt-2 text-xs font-body font-semibold text-brand-rust underline underline-offset-2 hover:no-underline"
           >
-            Subukan ulit
+            Try again
           </button>
         </div>
       )}
@@ -265,7 +265,7 @@ export default function SuggestPage() {
       {!isLoading && suggestions && suggestions.length > 0 && (
         <div className="space-y-3">
           <p className="text-xs font-body font-semibold text-brand-smoke uppercase tracking-widest mb-3">
-            {suggestions.length} Suggestions para sa {selectedMeal && MEAL_TYPE_FILIPINO[selectedMeal]}
+            {suggestions.length} Suggestions for {selectedMeal && MEAL_TYPE_FILIPINO[selectedMeal]}
           </p>
 
           {suggestions.map((dish, i) => (
@@ -278,7 +278,7 @@ export default function SuggestPage() {
               onClick={handleSuggest}
               className="text-xs font-body text-brand-smoke hover:text-brand-rust underline underline-offset-2 transition"
             >
-              Mag-generate ulit ng bagong suggestions
+              Generate new suggestions
             </button>
           </div>
         </div>
@@ -289,16 +289,16 @@ export default function SuggestPage() {
         <div className="text-center py-12 bg-brand-garlic border border-brand-rice rounded-2xl">
           <span className="text-5xl mb-4 block" aria-hidden="true">🍽️</span>
           <p className="font-display text-xl font-bold text-brand-bark mb-2">
-            Walang nasuggest
+            No suggestions found
           </p>
           <p className="text-sm font-body text-brand-smoke mb-5 max-w-xs mx-auto">
-            Subukan mag-dagdag ng mas maraming ingredients sa pantry mo.
+            Try adding more ingredients to your pantry.
           </p>
           <button
             onClick={handleSuggest}
             className="px-6 py-2.5 bg-brand-rust hover:bg-brand-silog text-white font-body font-semibold text-sm rounded-full transition-all active:scale-95"
           >
-            Subukan ulit
+            Try again
           </button>
         </div>
       )}
@@ -347,7 +347,7 @@ function SuggestionCard({
       const data = await res.json();
 
       if (!res.ok || !data.results || data.results.length === 0) {
-        setRecipeError("Hindi mahanap ang recipe. Subukan sa Search tab.");
+        setRecipeError("Could not find recipe. Try the Search tab.");
         return;
       }
 
@@ -356,7 +356,7 @@ function SuggestionCard({
       setRecipe(r);
       setCurrentServings(r.servings);
     } catch {
-      setRecipeError("Hindi maabot ang server. Subukan ulit.");
+      setRecipeError("Could not reach server. Please try again.");
     } finally {
       setIsFetchingRecipe(false);
     }
@@ -396,7 +396,7 @@ function SuggestionCard({
               }`}
             >
               {displayIsFullMatch
-                ? "✅ Kumpleto ang ingredients"
+                ? "✅ Complete ingredients"
                 : realMissingCount !== null
                   ? `⚠️ Missing ${realMissingCount} ingredient${realMissingCount !== 1 ? "s" : ""}`
                   : `⚠️ Missing ${dish.missingIngredients.length} ingredient${dish.missingIngredients.length !== 1 ? "s" : ""}`}
@@ -414,7 +414,7 @@ function SuggestionCard({
           <div className="shrink-0 text-right">
             {displayIsFullMatch ? (
               <span className="text-xs font-body font-semibold text-brand-leaf bg-brand-leaf/10 px-2 py-1 rounded-lg">
-                Kumpleto!
+                Complete!
               </span>
             ) : (
               <span className="text-xs font-body font-semibold text-brand-smoke bg-brand-rice px-2 py-1 rounded-lg">
@@ -428,7 +428,7 @@ function SuggestionCard({
         {!isFullMatch && dish.missingIngredients.length > 0 && (
           <div className="mt-3 pt-3 border-t border-brand-rice">
             <p className="text-xs font-body font-semibold text-brand-smoke uppercase tracking-widest mb-1.5">
-              Kulang pa:
+              Missing:
             </p>
             <div className="flex flex-wrap gap-1.5">
               {dish.missingIngredients.map((ing, i) => (
@@ -450,7 +450,7 @@ function SuggestionCard({
           onClick={handleToggle}
           className="flex items-center justify-center gap-1.5 w-full py-2.5 bg-brand-bark hover:bg-brand-bark/80 text-brand-garlic font-body font-semibold text-sm rounded-xl transition-all active:scale-[0.98]"
         >
-          {isExpanded ? "Itago ang Recipe ↑" : "Tingnan ang Recipe ↓"}
+          {isExpanded ? "Hide Recipe ↑" : "View Recipe ↓"}
         </button>
       </div>
 
@@ -464,7 +464,7 @@ function SuggestionCard({
               <svg className="animate-spin" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
               </svg>
-              <p className="text-xs font-body">Hinahanap ang recipe…</p>
+              <p className="text-xs font-body">Finding recipe…</p>
             </div>
           )}
 
@@ -476,7 +476,7 @@ function SuggestionCard({
                 onClick={() => { setRecipe(null); handleToggle(); }}
                 className="mt-2 text-xs font-body font-semibold text-brand-rust underline underline-offset-2"
               >
-                Subukan ulit
+                Try again
               </button>
             </div>
           )}
@@ -488,8 +488,8 @@ function SuggestionCard({
               <div className="px-4 py-3 bg-brand-rust/8 border-b border-brand-rust/20">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <div>
-                    <p className="font-body font-bold text-brand-bark text-sm">Ilang serving?</p>
-                    <p className="text-xs font-body text-brand-smoke mt-0.5">I-adjust ang dami</p>
+                    <p className="font-body font-bold text-brand-bark text-sm">How many servings?</p>
+                    <p className="text-xs font-body text-brand-smoke mt-0.5">Adjust the amount</p>
                   </div>
                   <div className="flex items-center gap-0 rounded-xl border-2 border-brand-rust overflow-hidden bg-white">
                     <button
@@ -532,10 +532,10 @@ function SuggestionCard({
               {/* Ingredients */}
               <div className="px-4 py-4 border-b border-brand-rice">
                 <p className="text-xs font-body font-semibold text-brand-smoke uppercase tracking-widest mb-3">
-                  Mga Sangkap
+                  Ingredients
                   {ratio !== 1 && (
                     <span className="ml-2 normal-case text-brand-rust font-normal">
-                      (para sa {servings} serving{servings !== 1 ? "s" : ""})
+                      (for {servings} serving{servings !== 1 ? "s" : ""})
                     </span>
                   )}
                 </p>
@@ -546,10 +546,10 @@ function SuggestionCard({
                     return (
                       <li key={j} className="flex items-center gap-2.5">
                         {present === true && (
-                          <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-leaf/15 text-brand-leaf text-xs" aria-label="nasa pantry">✓</span>
+                          <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-leaf/15 text-brand-leaf text-xs" aria-label="in pantry">✓</span>
                         )}
                         {present === false && (
-                          <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust text-xs" aria-label="wala sa pantry">✗</span>
+                          <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust text-xs" aria-label="not in pantry">✗</span>
                         )}
                         {present === null && (
                           <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-rice text-brand-smoke text-xs">•</span>
@@ -568,11 +568,11 @@ function SuggestionCard({
                   <div className="flex flex-wrap gap-3 mt-3 pt-3 border-t border-brand-rice">
                     <span className="text-xs font-body text-brand-smoke flex items-center gap-1">
                       <span className="w-4 h-4 rounded-full bg-brand-leaf/15 text-brand-leaf flex items-center justify-center text-xs">✓</span>
-                      nasa pantry mo
+                      in your pantry
                     </span>
                     <span className="text-xs font-body text-brand-smoke flex items-center gap-1">
                       <span className="w-4 h-4 rounded-full bg-brand-rust/10 text-brand-rust flex items-center justify-center text-xs">✗</span>
-                      kulang pa
+                      missing
                     </span>
                   </div>
                 )}
@@ -581,7 +581,7 @@ function SuggestionCard({
               {/* Steps */}
               <div className="px-4 py-4 border-b border-brand-rice">
                 <p className="text-xs font-body font-semibold text-brand-smoke uppercase tracking-widest mb-3">
-                  Paraan ng Pagluluto
+                  Cooking Steps
                 </p>
                 <ol className="space-y-3">
                   {recipe.steps.map((step) => (
@@ -595,7 +595,7 @@ function SuggestionCard({
                         </p>
                         {step.timerMinutes > 0 && (
                           <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-brand-silog/15 text-brand-silog font-body text-xs rounded-full">
-                            ⏱ {step.timerMinutes} minuto
+                            ⏱ {step.timerMinutes} min
                           </span>
                         )}
                       </div>

@@ -116,7 +116,7 @@ function ServingStepper({ value, onChange }: ServingStepperProps) {
         type="button"
         onClick={handleDecrement}
         disabled={value <= 1}
-        aria-label="Bawasan ang serving"
+        aria-label="Decrease serving"
         className="w-10 h-10 flex items-center justify-center text-brand-rust font-bold text-xl hover:bg-brand-rust/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         −
@@ -131,7 +131,7 @@ function ServingStepper({ value, onChange }: ServingStepperProps) {
         onChange={handleInputChange}
         onBlur={handleInputCommit}
         onKeyDown={handleKeyDown}
-        aria-label="Bilang ng servings"
+        aria-label="Number of servings"
         className="w-12 text-center font-body font-bold text-brand-bark text-base border-x border-brand-rust/30 h-10 focus:outline-none focus:bg-brand-rust/5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
@@ -140,7 +140,7 @@ function ServingStepper({ value, onChange }: ServingStepperProps) {
         type="button"
         onClick={handleIncrement}
         disabled={value >= 50}
-        aria-label="Dagdagan ang serving"
+        aria-label="Increase serving"
         className="w-10 h-10 flex items-center justify-center text-brand-rust font-bold text-xl hover:bg-brand-rust/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         +
@@ -165,6 +165,7 @@ function SearchInner() {
   const [error, setError] = useState("");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [pantryItems, setPantryItems] = useState<PantryItem[] | null>(null);
+  const [activeCookingRecipe, setActiveCookingRecipe] = useState<RecipeResult | null>(null);
 
   // Per-card serving state: cardIndex → currentServings
   // Separate so each card keeps its own serving count independently
@@ -204,12 +205,12 @@ function SearchInner() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "May error. Subukan ulit.");
+        setError(data.error ?? "There was an error. Please try again.");
         return;
       }
 
       if (!data.results || data.results.length === 0) {
-        setError("Walang nahanap. Subukan ng ibang pangalan.");
+        setError("No results found. Try a different name.");
         return;
       }
 
@@ -222,7 +223,7 @@ function SearchInner() {
       });
       setServingsMap(initial);
     } catch {
-      setError("Hindi maabot ang server. I-check ang iyong koneksyon.");
+      setError("Could not reach server. Check your connection.");
     } finally {
       setIsLoading(false);
     }
@@ -255,10 +256,10 @@ function SearchInner() {
           Recipe Search
         </p>
         <h1 className="font-display text-3xl font-bold text-brand-bark">
-          Hanapin ang Recipe
+          Search Recipe
         </h1>
         <p className="text-sm font-body text-brand-smoke mt-1">
-          I-type ang pangalan ng ulam — makikita mo ang recipe at mga ingredients.
+          Type the name of any dish — you&apos;ll see the recipe and ingredients.
         </p>
       </div>
 
@@ -290,7 +291,7 @@ function SearchInner() {
                 <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
               </svg>
             ) : (
-              "Hanapin"
+              "Search"
             )}
           </button>
         </div>
@@ -310,7 +311,7 @@ function SearchInner() {
       {!isLoading && results && (
         <div className="space-y-3">
           <p className="text-xs font-body font-semibold text-brand-smoke uppercase tracking-widest mb-3">
-            {results.length} resulta para sa &ldquo;{query}&rdquo;
+            {results.length} results for &ldquo;{query}&rdquo;
           </p>
 
           {results.map((recipe, i) => {
@@ -340,12 +341,12 @@ function SearchInner() {
                       const missing = countMissing(recipe.ingredients, pantryItems);
                       if (missing === 0) return (
                         <span className="inline-block mt-1 text-xs font-body font-semibold text-brand-leaf">
-                          ✅ Kumpleto sa pantry
+                          ✅ Complete in pantry
                         </span>
                       );
                       if (missing !== null && missing > 0) return (
                         <span className="inline-block mt-1 text-xs font-body font-semibold text-brand-silog">
-                          ⚠️ {missing} ingredient{missing !== 1 ? "s" : ""} kulang
+                          ⚠️ Missing {missing} ingredient{missing !== 1 ? "s" : ""}
                         </span>
                       );
                       return null;
@@ -369,10 +370,10 @@ function SearchInner() {
                       <div className="flex items-center justify-between gap-4 flex-wrap">
                         <div>
                           <p className="font-body font-bold text-brand-bark text-sm">
-                            Ilang serving?
+                            How many servings?
                           </p>
                           <p className="text-xs font-body text-brand-smoke mt-0.5">
-                            I-adjust ang dami ng pagkain
+                            Adjust the amount
                           </p>
                         </div>
                         <ServingStepper
@@ -393,8 +394,15 @@ function SearchInner() {
                         <div className="flex items-center gap-1.5">
                           <span className="text-base" aria-hidden="true">💰</span>
                           <div>
-                            <p className="text-xs font-body text-brand-smoke">Estimated Cost</p>
+                            <p className="text-xs font-body text-brand-smoke">Total Cost</p>
                             <p className="font-body font-bold text-brand-bark text-sm">₱{scaledCost}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base" aria-hidden="true">💡</span>
+                          <div>
+                            <p className="text-xs font-body text-brand-smoke">Per Serving</p>
+                            <p className="font-body font-bold text-brand-bark text-sm">₱{Math.round(scaledCost / currentServings)}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1.5">
@@ -410,10 +418,10 @@ function SearchInner() {
                     {/* ── Ingredients ── */}
                     <div className="px-4 py-4 border-b border-brand-rice">
                       <p className="text-xs font-body font-semibold text-brand-smoke uppercase tracking-widest mb-3">
-                        Mga Sangkap
+                        Ingredients
                         {currentServings !== recipe.servings && (
                           <span className="ml-2 normal-case text-brand-rust font-normal">
-                            (scaled para sa {currentServings} serving{currentServings !== 1 ? "s" : ""})
+                            (scaled for {currentServings} serving{currentServings !== 1 ? "s" : ""})
                           </span>
                         )}
                       </p>
@@ -424,10 +432,10 @@ function SearchInner() {
                           return (
                             <li key={j} className="flex items-center gap-2.5">
                               {present === true && (
-                                <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-leaf/15 text-brand-leaf text-xs" aria-label="nasa pantry">✓</span>
+                                <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-leaf/15 text-brand-leaf text-xs" aria-label="in pantry">✓</span>
                               )}
                               {present === false && (
-                                <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust text-xs" aria-label="wala sa pantry">✗</span>
+                                <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust text-xs" aria-label="not in pantry">✗</span>
                               )}
                               {present === null && (
                                 <span className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-brand-rice text-brand-smoke text-xs">•</span>
@@ -447,54 +455,27 @@ function SearchInner() {
                         <div className="flex flex-wrap gap-3 mt-3 pt-3 border-t border-brand-rice">
                           <span className="text-xs font-body text-brand-smoke flex items-center gap-1">
                             <span className="w-4 h-4 rounded-full bg-brand-leaf/15 text-brand-leaf flex items-center justify-center text-xs">✓</span>
-                            nasa pantry mo
+                            in your pantry
                           </span>
                           <span className="text-xs font-body text-brand-smoke flex items-center gap-1">
                             <span className="w-4 h-4 rounded-full bg-brand-rust/10 text-brand-rust flex items-center justify-center text-xs">✗</span>
-                            kulang pa
+                            missing
                           </span>
                         </div>
                       )}
                     </div>
 
-                    {/* ── Steps ── */}
-                    <div className="px-4 py-4 border-b border-brand-rice">
-                      <p className="text-xs font-body font-semibold text-brand-smoke uppercase tracking-widest mb-3">
-                        Paraan ng Pagluluto
-                      </p>
-                      <ol className="space-y-3">
-                        {recipe.steps.map((step) => (
-                          <li key={step.step} className="flex gap-3">
-                            <span className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-brand-bark text-white font-body font-bold text-xs mt-0.5">
-                              {step.step}
-                            </span>
-                            <div className="flex-1">
-                              <p className="font-body text-sm text-brand-bark leading-relaxed">
-                                {step.instruction}
-                              </p>
-                              {step.timerMinutes > 0 && (
-                                <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-brand-silog/15 text-brand-silog font-body text-xs rounded-full">
-                                  ⏱ {step.timerMinutes} minuto
-                                </span>
-                              )}
-                            </div>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-
                     {/* ── Action buttons ── */}
                     <div className="px-4 py-4 flex flex-col sm:flex-row gap-2">
                       <button
-                        disabled
-                        title="Coming soon"
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-brand-rice text-brand-smoke/60 font-body font-semibold text-sm rounded-xl cursor-not-allowed"
+                        onClick={() => setActiveCookingRecipe(recipe)}
+                        title="Start Cooking"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-brand-bark hover:bg-brand-rust text-white font-body font-semibold text-sm rounded-xl transition-all"
                       >
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polygon points="5 3 19 12 5 21 5 3"/>
                         </svg>
                         Start Cooking
-                        <span className="text-xs bg-brand-smoke/20 px-1.5 py-0.5 rounded-full">Soon</span>
                       </button>
                       <button
                         disabled
@@ -521,10 +502,10 @@ function SearchInner() {
         <div className="text-center py-16">
           <span className="text-5xl mb-4 block" aria-hidden="true">🔍</span>
           <p className="font-display text-xl font-bold text-brand-bark mb-2">
-            Maghanap ng Ulam
+            Search for a Dish
           </p>
           <p className="text-sm font-body text-brand-smoke max-w-xs mx-auto">
-            I-type ang pangalan ng kahit anong Filipino dish para makita ang recipe.
+            Type the name of any Filipino dish to see the recipe.
           </p>
           <div className="flex flex-wrap justify-center gap-2 mt-6">
             {["Sinigang", "Adobo", "Tinola", "Kare-kare", "Menudo", "Nilaga"].map((s) => (
@@ -540,10 +521,56 @@ function SearchInner() {
           {!paramDish && (
             <div className="mt-8">
               <Link href="/suggest" className="text-sm font-body text-brand-rust font-semibold hover:underline underline-offset-2">
-                ← Bumalik sa Suggest
+                ← Back to Suggest
               </Link>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Cooking Steps Modal ── */}
+      {activeCookingRecipe && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-bark/40 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-md bg-brand-garlic rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[85vh] animate-slide-up">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-brand-rice bg-white">
+              <div>
+                <h2 className="font-display text-lg font-bold text-brand-bark">Cooking Steps</h2>
+                <p className="text-xs font-body text-brand-smoke truncate max-w-[200px] sm:max-w-[280px]">
+                  {activeCookingRecipe.name}
+                </p>
+              </div>
+              <button
+                onClick={() => setActiveCookingRecipe(null)}
+                className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-brand-rice text-brand-smoke hover:bg-brand-rust/10 hover:text-brand-rust transition"
+                aria-label="Close"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-5 overflow-y-auto">
+              <ol className="space-y-4">
+                {activeCookingRecipe.steps.map((step) => (
+                  <li key={step.step} className="flex gap-3">
+                    <span className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-brand-rust text-white font-body font-bold text-sm">
+                      {step.step}
+                    </span>
+                    <div className="flex-1 pt-0.5">
+                      <p className="font-body text-sm text-brand-bark leading-relaxed">
+                        {step.instruction}
+                      </p>
+                      {step.timerMinutes > 0 && (
+                        <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-brand-silog/15 text-brand-silog font-body text-xs rounded-full">
+                          ⏱ {step.timerMinutes} min
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
         </div>
       )}
     </div>

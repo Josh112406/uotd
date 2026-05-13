@@ -62,7 +62,6 @@ function formatNumber(n: number): string {
 }
 
 export function scaleAmount(amount: string, ratio: number): string {
-  if (ratio === 1) return amount;
 
   const str = amount.trim();
 

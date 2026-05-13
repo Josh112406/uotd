@@ -11,7 +11,7 @@ const FEATURES = [
     description:
       "Ilagay ang mga sangkap sa bahay mo — bibigyan ka namin ng mga pwedeng ulam na luto ngayon.",
     href: "/suggest",
-    cta: "Subukan",
+    cta: "Try it",
   },
   {
     emoji: "📅",
@@ -20,7 +20,7 @@ const FEATURES = [
     description:
       "Planuhin ang iyong menu para sa isang linggo. Makatipid ng pera, oras, at utak sa palengke.",
     href: "/suggest",
-    cta: "Mag-simula",
+    cta: "Get Started",
   },
   {
     emoji: "🔍",
@@ -29,7 +29,7 @@ const FEATURES = [
     description:
       "Hanapin ang recipe ng paboritong ulam, o alamin kung anong kailangan mong bilhin.",
     href: "/search",
-    cta: "Hanapin",
+    cta: "Search",
   },
 ];
 
@@ -86,13 +86,13 @@ export default function HomePage() {
             href="/suggest"
             className="px-7 py-3 bg-brand-rust hover:bg-brand-silog active:scale-95 text-white font-body font-semibold rounded-full text-sm shadow-md transition-all duration-150"
           >
-            Kumuha ng Mungkahi →
+            Get Suggestions →
           </Link>
           <Link
             href="/search"
             className="px-7 py-3 border border-brand-rust text-brand-rust hover:bg-brand-rust hover:text-white active:scale-95 font-body font-semibold rounded-full text-sm transition-all duration-150"
           >
-            Hanapin ang Recipe
+            Search Recipe
           </Link>
         </div>
 
@@ -120,7 +120,7 @@ export default function HomePage() {
             href="/search"
             className="shrink-0 px-5 py-2.5 bg-brand-bark hover:bg-brand-rust text-white font-body font-semibold text-sm rounded-full transition-all duration-150"
           >
-            Tingnan ang Recipe →
+            View Recipe →
           </Link>
         </div>
       </section>
