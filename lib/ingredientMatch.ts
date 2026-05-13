@@ -39,6 +39,12 @@ const FIL_TO_ENG: Record<string, string[]> = {
   "tocino": ["tocino", "sweet cured pork"],
   "longganisa": ["longganisa", "filipino sausage"],
   "tapa": ["tapa", "cured beef", "beef tapa"],
+  "tokwa": ["tofu", "firm tofu"],
+  "tuwalya": ["beef tripe", "tripe"],
+  "pata": ["pork hock", "pork knuckle", "pata"],
+  "tadyang": ["ribs", "beef ribs", "pork ribs", "spare ribs"],
+  "chorizo": ["chorizo", "spanish sausage"],
+  "bacon": ["bacon"],
   
   // Seafood
   "isda": ["fish"],
@@ -54,6 +60,11 @@ const FIL_TO_ENG: Record<string, string[]> = {
   "tuyo": ["dried fish", "salted fish"],
   "daing": ["dried fish"],
   "tinapa": ["smoked fish"],
+  "alamang": ["krill", "small shrimp", "alamang"],
+  "lapu-lapu": ["grouper", "lapu-lapu"],
+  "maya-maya": ["snapper", "red snapper"],
+  "tulingan": ["mackerel tuna", "tulingan"],
+  "tambakol": ["yellowfin tuna", "tambakol"],
 
   // Vegetables
   "sibuyas": ["onion", "onions", "red onion", "white onion"],
@@ -82,6 +93,12 @@ const FIL_TO_ENG: Record<string, string[]> = {
   "monggo": ["mung beans", "munggo", "green gram"],
   "labong": ["bamboo shoots"],
   "puso ng saging": ["banana blossom", "banana heart"],
+  "upo": ["bottle gourd", "calabash"],
+  "mustasa": ["mustard greens", "mustard leaves"],
+  "chicharo": ["snow peas", "snap peas", "chicharo"],
+  "togue": ["bean sprouts", "mung bean sprouts", "togue"],
+  "saluyot": ["jute leaves", "saluyot"],
+  "alugbati": ["malabar spinach", "alugbati"],
 
   // Spices & Condiments
   "bawang": ["garlic"],
@@ -105,6 +122,13 @@ const FIL_TO_ENG: Record<string, string[]> = {
   "tomato paste": ["tomato paste"],
   "tomato sauce": ["tomato sauce"],
   "lechon sauce": ["lechon sauce", "sarsa", "mang tomas"],
+  "wansoy": ["cilantro", "coriander leaves"],
+  "kinchay": ["celery", "chinese celery"],
+  "star anise": ["star anise"],
+  "sesame oil": ["sesame oil"],
+  "hoisin sauce": ["hoisin sauce"],
+  "chili oil": ["chili oil"],
+  "vetsin": ["msg", "monosodium glutamate", "vetsin"],
 
   // Grains, Noodles & Staples
   "kanin": ["rice", "cooked rice", "day-old rice"],
@@ -118,6 +142,8 @@ const FIL_TO_ENG: Record<string, string[]> = {
   "miki": ["miki noodles", "fresh egg noodles"],
   "lumpia wrapper": ["lumpia wrapper", "spring roll wrapper", "crepe wrapper"],
   "tinapay": ["bread", "tasty bread", "sliced bread", "pandesal"],
+  "macaroni": ["macaroni", "elbow macaroni"],
+  "spaghetti": ["spaghetti", "spaghetti noodles", "pasta"],
 
   // Canned Goods
   "corned beef": ["corned beef"],
@@ -134,10 +160,12 @@ const FIL_TO_ENG: Record<string, string[]> = {
   "sabaw": ["broth", "stock", "soup", "water"],
 
   // Dairy & Eggs
-  "gatas": ["milk", "evaporated milk", "condensed milk"],
+  "gatas": ["milk", "evaporated milk", "condensed milk", "fresh milk"],
   "mantikilya": ["butter"],
   "keso": ["cheese", "cheddar cheese", "processed cheese", "eden cheese"],
   "itlog na maalat": ["salted egg", "salted duck egg"],
+  "margarine": ["margarine", "star margarine"],
+  "crema": ["cream", "all-purpose cream", "nestle cream", "heavy cream", "table cream"],
 
   // Fruits (often used in cooking)
   "saging": ["banana", "saba banana", "plantain"],
